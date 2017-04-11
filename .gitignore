@@ -1,0 +1,7 @@
+# .gitignore for CS202 Project 3: Matrix Math Program
+
+/*.o
+
+/*.sh
+
+matrix_math
