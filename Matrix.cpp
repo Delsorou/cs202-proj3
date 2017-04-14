@@ -17,6 +17,10 @@ Aaryna Irwin            2017-04-11         0.1
 ----------------------------------------------------------------------------- */
 
 #include <iostream>
+#include <iomanip>
+// Note: this is included for the to_string() function only, to format output
+#include <string>
+#define FLD std::setw(5)
 
 /* -----------------------------------------------------------------------------
 FUNCTION:          Matrix()
@@ -28,7 +32,7 @@ template <class T>
 Matrix<T>::Matrix()
 {
 	row = 0, col = 0;
-	mtx = nullptr;
+	*mtx = nullptr;
 }
 
 /* -----------------------------------------------------------------------------
@@ -135,12 +139,13 @@ NOTES:             None
 template <class T>
 std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)
 {
-	os << m.row << 'x' << m.col << std::endl;
+	os << std::setprecision(3) << std::fixed << FLD
+		<< std::to_string(m.row) + 'x' + std::to_string(m.col) << std::endl;
 
 	for (int i = 0; i < m.row; ++i)
 	{
 		for (int j = 0; j < m.col; ++j)
-			os << m.mtx[i][j] << ' ';
+			os << FLD << m.mtx[i][j] << ' ';
 		os << std::endl;
 	}
 
@@ -156,11 +161,16 @@ NOTES:             None
 template <class T>
 std::istream& operator>>(std::istream& is, Matrix<T>& m)
 {
-	is >> m.row;
+	T rowB, colB;
+	is >> rowB;
 	is.ignore(1);
-	is >> m.col;
+	is >> colB;
 
-	m.resize(m.row, m.col);
+	if (rowB != m.row || colB != m.col)
+	{
+		m.row = rowB, m.col = colB;
+		m.resize(rowB, colB);
+	}
 
 	for (int i = 0; i < m.row; ++i)
 	{
