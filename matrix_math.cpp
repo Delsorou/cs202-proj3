@@ -23,14 +23,14 @@ int main(int argc, char* argv[])
 {
 	std::fstream file("A.mtx", std::ios::in | std::ios::out);
 
-	Matrix<int> mat1;
-	Matrix<int> mat2;
+	Matrix_ops<int> mat1;
+	Matrix_ops<int> mat2;
 
 	file >> mat1;
+	mat2 = mat1;
+	mat1 += mat2;
+
 	std::cout << mat1 << std::endl << " 1 OK\n";
-	// This demonstrates move assignment - assign any matrix with six
-	// assignment operations
-	mat2 = static_cast<Matrix<int>&&>(mat1);
 	std::cout << mat2 << std::endl << " 2 OK\n";
 
 	file.close();

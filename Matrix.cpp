@@ -122,7 +122,7 @@ RETURNS:           N/A
 NOTES:             None
 ----------------------------------------------------------------------------- */
 template <class T>
-Matrix<T>::Matrix(Matrix<T>&& other)
+Matrix<T>::Matrix(Matrix<T>&& other) noexcept
 {
 	// Initialize dimension values to other matrix values
 	row = other.row, col = other.col;
@@ -256,4 +256,126 @@ std::istream& operator>>(std::istream& is, Matrix<T>& other)
 	}
 
 	return is;
+}
+
+/* -----------------------------------------------------------------------------
+FUNCTION:          operator+=(const Matrix<T>& other)
+DESCRIPTION:       Compound addition assignment operator for Matrix class
+RETURNS:           Matrix<T>&
+NOTES:             None
+----------------------------------------------------------------------------- */
+template <class T>
+Matrix<T>& Matrix_ops<T>::operator+=(const Matrix<T>& other)
+{
+	// Throw an exception if not suitable for addition
+	if (this->getRow() != other.getRow() || this->getCol() != other.getCol())
+		throw "Invalid operation (addition)...";
+
+	// Sum assign other matrix values element by element
+	for (int i = 0; i < this->getRow(); ++i)
+	{
+		for (int j = 0; j < this->getCol(); ++j)
+		{
+			T buffer = this->getElm(i, j) + other.getElm(i, j);
+			this->setElm(i, j, buffer);
+		}
+	}
+
+	return *this;
+}
+
+/* -----------------------------------------------------------------------------
+FUNCTION:          operatorc-=(const Matrix<T>& other)
+DESCRIPTION:       Compound subtraction assignment operator for Matrix class
+RETURNS:           Matrix<T>&
+NOTES:             None
+----------------------------------------------------------------------------- */
+template <class T>
+Matrix<T>& Matrix_ops<T>::operator-=(const Matrix<T>& other)
+{
+	// Throw an exception if not suitable for subtraction
+	if (this->row != other.row || this->col != other.col)
+		throw "Invalid operation (subtraction)...";
+
+	// Difference assign other matrix values element by element
+	for (int i = 0; i < this->row; ++i)
+	{
+		for (int j = 0; j < this->col; ++j)
+		{
+			T buffer = this->getElm(i, j) - other.getElm(i, j);
+			this->setElm(i, j, buffer);
+		}
+	}
+
+	return *this;
+}
+
+/* -----------------------------------------------------------------------------
+FUNCTION:          operator*=(const Matrix<T>& other)
+DESCRIPTION:       Compound multiplication assignment operator for Matrix class
+RETURNS:           Matrix<T>&
+NOTES:             None
+----------------------------------------------------------------------------- */
+template <class T>
+Matrix<T>& Matrix_ops<T>::operator*=(const Matrix<T>& other)
+{
+	// Throw an exception if not suitable for multiplication
+//	if (this->col != other.row)
+//		throw "Invalid operation (matrix multiplication)...";
+
+	// Make a buffer object to hold the product
+//	Matrix_ops<T> product(this->row, other.col);
+
+	return *this;
+}
+
+/* -----------------------------------------------------------------------------
+FUNCTION:          operator*=(const Matrix<T>& scalar)
+DESCRIPTION:       Compound scalar multiplication assignment operator
+                   for Matrix class
+RETURNS:           Matrix<T>&
+NOTES:             None
+----------------------------------------------------------------------------- */
+template <class T>
+Matrix<T>& Matrix_ops<T>::operator*=(const T& scalar)
+{
+	for (int i = 0; i < this->row; ++i)
+	{
+		for (int j = 0; j < this->col; ++j)
+			this->mtx[i][j] *= scalar;
+	}
+
+	return *this;
+}
+
+/* -----------------------------------------------------------------------------
+FUNCTION:          operator==(const Matrix<T>& other)
+DESCRIPTION:       Compound addition assignment operator for Matrix class
+RETURNS:           Matrix<T>&
+NOTES:             None
+----------------------------------------------------------------------------- */
+template <class T>
+bool Matrix_ops<T>::operator==(const Matrix<T>& other) const
+{
+	// Initialze boolean buffer for equality
+	bool isEqual = true;
+
+	// If row or column is not equal, it can't be equal
+	if (this->row != other.row || this->col != other.col)
+		isEqual = false;
+
+	// If any member is not equal, it's not equal (skip if already failed)
+	if (isEqual)
+	{
+		for (int i = 0; i < this->row; ++i)
+		{
+			for (int j = 0; j < this->col; ++j)
+			{
+				if (this->mtx[i][j] != other.mtx[i][j])
+					isEqual = false;
+			}
+		}
+	}
+
+	return *this;
 }
