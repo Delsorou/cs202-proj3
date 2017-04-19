@@ -18,41 +18,79 @@ Aaryna Irwin            2017-04-11         0.1
 
 #include <iostream>
 #include <iomanip>
-// Note: this is included for the to_string() function only, to format output
-#include <string>
-#define FLD std::setw(5)
+#include <limits>
+
+/* -----------------------------------------------------------------------------
+FUNCTION:          goodSize(Matrix<T>& other)
+DESCRIPTION:       Returns true if size is not too small to fit or way too big
+RETURNS:           bool
+NOTES:             None
+----------------------------------------------------------------------------- */
+template <class T>
+bool Matrix<T>::goodSize(const Matrix<T>& other) const
+{
+	// If it's not too small, or more than twice as big, it's good
+	if ((row > other.row && col > other.col) 
+		&& (row <= other.row * 2 && col <= other.col * 2))
+	   	return true;
+	// Otherwise it's not
+	else
+		return false;
+}
+
+/* -----------------------------------------------------------------------------
+FUNCTION:          resize(Matrix<T>& other)
+DESCRIPTION:       Deletes the existing matrix and initialzes a new zero matrix
+                   of specified row, column dimensions
+RETURNS:           Void function
+NOTES:             Does not assign dimension values
+----------------------------------------------------------------------------- */
+template <class T>
+void Matrix<T>::resize(const Matrix<T>& other)
+{
+	// Delete existing matrix arrays from heap
+	for (int i = 0; i < row; ++i)
+		delete[] mtx[i];
+	delete[] mtx;
+
+	// Create and initialize new matrix array of specified dimensions on heap
+	mtx = new T*[other.row];
+	for (int i = 0; i < other.row; ++i)
+		mtx[i] = new T[other.col] { 0 };
+}
 
 /* -----------------------------------------------------------------------------
 FUNCTION:          Matrix()
-DESCRIPTION:       Default constructor for Matrix class
+DESCRIPTION:       Default constructor (1x1 zero matrix)
 RETURNS:           N/A
 NOTES:             None
 ----------------------------------------------------------------------------- */
 template <class T>
 Matrix<T>::Matrix()
 {
-	row = 0, col = 0;
-	*mtx = nullptr;
+	// Initialize default matrix dimensions
+	row = 1, col = 1;
+	// Create and initialize single element zero matrix array on heap
+	mtx = new T*;
+	mtx[0] = new T { 0 };
 }
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          Matrix(const int, const int)
-DESCRIPTION:       Parameterized constructor for Matrix class
+FUNCTION:          Matrix(const int r, const int c)
+DESCRIPTION:       Constructs zero matrix of specified row, column dimensions
 RETURNS:           N/A
 NOTES:             None
 ----------------------------------------------------------------------------- */
 template <class T>
-Matrix<T>::Matrix(int r, int c)
+Matrix<T>::Matrix(const int r, const int c)
 {
+	// Initialize matrix dimensions
 	row = r, col = c;
+
+	// Create and intialize new zero matrix on heap of specified dimensions
 	mtx = new T*[r];
-	
 	for (int i = 0; i < r; ++i)
-	{
-		mtx[i] = new T[c];
-		for (int j = 0; j < c; ++j)
-			mtx[i][j] = 0;
-	}
+		mtx[i] = new T[c] { 0 };
 }
 
 /* -----------------------------------------------------------------------------
@@ -62,90 +100,122 @@ RETURNS:           N/A
 NOTES:             None
 ----------------------------------------------------------------------------- */
 template <class T>
-Matrix<T>::Matrix(const Matrix<T>& m)
+Matrix<T>::Matrix(const Matrix<T>& other)
 {
-	row = m.row, col = m.col;
-	mtx = new T*[row];
+	// Initialize dimension values to other matrix values
+	row = other.row, col = other.col;
 
+	// Create new matrix of other dimensions and copy each element
+	mtx = new T*[row];
 	for (int i = 0; i < row; ++i)
 	{
 		mtx[i] = new T[col];
 		for (int j = 0; j < col; ++j)
-			mtx[i][j] = m.mtx[i][j];
+			mtx[i][j] = other.mtx[i][j];
 	}
+}
+
+/* -----------------------------------------------------------------------------
+FUNCTION:          Matrix(const Matrix<T>&&)
+DESCRIPTION:       Move constructor for Matrix class
+RETURNS:           N/A
+NOTES:             None
+----------------------------------------------------------------------------- */
+template <class T>
+Matrix<T>::Matrix(Matrix<T>&& other)
+{
+	// Initialize dimension values to other matrix values
+	row = other.row, col = other.col;
+
+	// Reuse existing memory resource of temporary object
+	mtx = &other.mtx;
+
+	// Zero other address in case of destruction
+	other.mtx = nullptr, other.row = 0, other.col = 0;
 }
 
 /* -----------------------------------------------------------------------------
 FUNCTION:          ~Matrix()
 DESCRIPTION:       Default destructor for Matrix class
 RETURNS:           N/A
-NOTES:             None
+NOTES:             Fresh and sassy
 ----------------------------------------------------------------------------- */
 template <class T>
 Matrix<T>::~Matrix()
 {
+	// Delete deez nuts
 	for (int i = 0; i < row; ++i)
 		delete[] mtx[i];
 	delete[] mtx;
 }
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          set(const int, const int, const T)
-DESCRIPTION:       Sets the value or a matrix member
-RETURNS:           Void function
-NOTES:             Throws an exception if the index is out of bounds
------------------------------------------------------------------------------ */
-template <class T>
-void Matrix<T>::set(const int r, const int c, const T k)
-{
-	if (r > row)
-		throw "Invalid row index";
-	else if (c > col)
-		throw "Invalid column index";
-
-	mtx[r][c] = k;
-}
-
-/* -----------------------------------------------------------------------------
-FUNCTION:          resize(const int, const int)
-DESCRIPTION:       Deletes the existing matrix and initialzes a new zero matrix
-RETURNS:           Void function
+FUNCTION:          operator=(const Matrix<T>& other)
+DESCRIPTION:       Copy assignment operator for Matrix class
+RETURNS:           Matrix<T>&
 NOTES:             None
 ----------------------------------------------------------------------------- */
 template <class T>
-void Matrix<T>::resize(const int r, const int c)
+Matrix<T>& Matrix<T>::operator=(const Matrix<T>& other)
 {
-	for (int i = 0; i < row; ++i)
-		delete[] mtx[i];
-	delete[] mtx;
+	// Skip resize if we can get away with it
+	if (!goodSize(other))
+		resize(other);
 
-	row = r, col = c;
-	mtx = new T*[r];
-	
-	for (int i = 0; i < r; ++i)
+	// Copy other matrix dimension values
+	row = other.row, col = other.col;
+
+	// Copy other matrix values element by element
+	for (int i = 0; i < row; ++i)
 	{
-		mtx[i] = new T[c];
-		for (int j = 0; j < c; ++j)
-			mtx[i][j] = 0;
+		for (int j = 0; j < col; ++j)
+			mtx[i][j] = other.mtx[i][j];
 	}
+
+	return *this;
 }
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          operator<<(ostream&, Matrix<T>&)
+FUNCTION:          operator=(Matrix<T>&& other)
+DESCRIPTION:       Move assignment operator for Matrix class
+RETURNS:           Matrix<T>&
+NOTES:             Memory leak on self-assignment (so don't do that)
+----------------------------------------------------------------------------- */
+template <class T>
+Matrix<T>& Matrix<T>::operator=(Matrix<T>&& other) noexcept
+{
+	// Copy other matrix dimension values
+	row = other.row, col = other.col;
+
+	// Move allocated memory directly
+	mtx = other.mtx;
+
+	// Zero other matrix storage pointer to prevent deallocation
+	other.mtx = nullptr, other.row = 0, other.col = 0;
+
+	// Whee, that was fast, thanks C++11 move semantics!
+	return *this;
+}
+
+/* -----------------------------------------------------------------------------
+FUNCTION:          operator<<(ostream& os, Matrix<T>& other)
 DESCRIPTION:       Stream insertion operator for Matrix class
 RETURNS:           ostream&
 NOTES:             None
 ----------------------------------------------------------------------------- */
 template <class T>
-std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)
+std::ostream& operator<<(std::ostream& os, const Matrix<T>& other)
 {
-	os << std::setprecision(3) << std::fixed << FLD
-		<< std::to_string(m.row) + 'x' + std::to_string(m.col) << std::endl;
+	// Insert the matrix dimensions on the first line
+	os << std::setprecision(3) << std::fixed << FLD 
+		<< other.row << " x " << std::left << other.col
+		<< std::right << std::endl;
 
-	for (int i = 0; i < m.row; ++i)
+	// Insert the matrix, row per line
+	for (int i = 0; i < other.row; ++i)
 	{
-		for (int j = 0; j < m.col; ++j)
-			os << FLD << m.mtx[i][j] << ' ';
+		for (int j = 0; j < other.col; ++j)
+			os << FLD << other.mtx[i][j] << ' ';
 		os << std::endl;
 	}
 
@@ -153,29 +223,36 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& m)
 }
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          operator>>(istream&, Matrix<T>&)
+FUNCTION:          operator>>(istream& is, Matrix<T>& other)
 DESCRIPTION:       Stream extraction operator for Matrix class
 RETURNS:           istream&
 NOTES:             None
 ----------------------------------------------------------------------------- */
 template <class T>
-std::istream& operator>>(std::istream& is, Matrix<T>& m)
+std::istream& operator>>(std::istream& is, Matrix<T>& other)
 {
-	T rowB, colB;
-	is >> rowB;
-	is.ignore(1);
-	is >> colB;
+	// Create template type buffers for matrix dimension values
+	T buffR, buffC;
+	// Extract row value from stream into buffer
+	is >> buffR;
+	// Skip the x
+	is.ignore(std::numeric_limits<std::streamsize>::max(), 'x');
+	// Extrract column value from stream into buffer
+	is >> buffC;
 
-	if (rowB != m.row || colB != m.col)
-	{
-		m.row = rowB, m.col = colB;
-		m.resize(rowB, colB);
-	}
+	// Resize other matrix only if necessary
+	Matrix<T> buffMat(buffR, buffC);
+	if (!other.goodSize(buffMat))
+		other.resize(buffMat);
 
-	for (int i = 0; i < m.row; ++i)
+	// Copy matrix dimension values
+	other.row = buffR, other.col = buffC;
+
+	// Extract the matrix entries, element by element
+	for (int i = 0; i < other.row; ++i)
 	{
-		for (int j = 0; j < m.col; ++j)
-			is >> m.mtx[i][j];
+		for (int j = 0; j < other.col; ++j)
+			is >> other.mtx[i][j];
 	}
 
 	return is;
