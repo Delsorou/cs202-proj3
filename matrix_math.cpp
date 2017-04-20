@@ -17,22 +17,32 @@ Aaryna Irwin            2017-04-11         0.1
 ----------------------------------------------------------------------------- */
 
 #include <fstream>
+#include <vector>
 #include "Matrix.h"
 
 int main(int argc, char* argv[])
 {
 	std::fstream file("A.mtx", std::ios::in | std::ios::out);
+	Matrix_ops<int> read_buffer;
+	file >> read_buffer;
 
-	Matrix_ops<int> mat1;
-	Matrix_ops<int> mat2;
+	std::vector<Matrix_ops<int>> test_bed(10, read_buffer );
 
-	file >> mat1;
-	mat2 = mat1;
-	mat1 += mat2;
-
-	std::cout << mat1 << std::endl << " 1 OK\n";
-	std::cout << mat2 << std::endl << " 2 OK\n";
-
+	std::cout << "Demonstrate addition and addition assignment\n";
+	std::cout << test_bed[0] + test_bed[1];
+	test_bed[0] += test_bed[1];
+	std::cout << test_bed[0];
+	std::cout << "Demonstrate subtraction and subtraction assignment\n";
+	std::cout << test_bed[1] - test_bed[2];
+	test_bed[1] -= test_bed[2];
+	std::cout << test_bed[1];
+	std::cout << "Demonstrate multiplication and multiplication assignment\n";
+	std::cout << test_bed[2] * test_bed[3];
+	test_bed[2] *= test_bed[3];
+	std::cout << test_bed[2];
+	std::cout << "Demonstrate equality and inequality\n";
+	std::cout << std::boolalpha << (test_bed[0] == test_bed[1]) << std::endl
+		<< (test_bed[0] != test_bed[1]);
 	file.close();
 
 	return 0;

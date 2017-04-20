@@ -38,6 +38,7 @@ class Matrix
 	int row, col;
 	// Matrix array storage pointer (template type)
 	T **mtx;
+
 	// Matrix dimension validation before expensive resize
 	bool goodSize(const Matrix<T>& other) const;
 	// Matrix array resize function (new zero matrix)
@@ -55,21 +56,18 @@ public:
 	// Destructor
 	virtual ~Matrix();
 
-	// Row dimension accessor and mutuator functions (inline)
-	void setRow(const int r)
-	{ row = r; };
+	// Row dimension accessor (inline)
 	int getRow() const
 	{ return row; };
 
-	// Column dimension accessor and mutator functions (inline)
-	void setCol(const int c)
-	{ col = c; };
+	// Column dimension accessor (inline)
 	int getCol() const
 	{ return col; };
 
 	// Matrix element mutator function (row, col, val) (inline)
 	void setElm(const int r, const int c, const T k)
 	{ mtx[r][c] = k; };
+
 	// Matrix element accessor function (row, col) (inline)
 	T getElm(const int r, const int c) const
 	{ return mtx[r][c]; };
@@ -91,31 +89,49 @@ template <class T>
 class Matrix_ops : public Matrix<T>
 {
 public:
-	// Addition operator
-	Matrix<T>& operator+=(const Matrix<T>& other);
-	friend Matrix<T> operator+(Matrix<T> left, const Matrix<T>& other)
+	// Default constructor
+	Matrix_ops() : Matrix<T>()
+	{ }
+
+	// Derived class parameterized constructor
+	Matrix_ops(const int r, const int c) : Matrix<T>(r, c)
+	{ }
+	
+	// Addition compound assignment operator
+	Matrix_ops<T>& operator+=(const Matrix_ops<T>& other);
+	/* Binary addition operator defined via compound assignment
+	 * and declared as a friend for operand symmetry */
+	friend Matrix_ops<T> operator+
+		(Matrix_ops<T> left, const Matrix_ops<T>& other)
 	{ return left += other; };
 
 	// Subtraction operator
-	Matrix<T>& operator-=(const Matrix<T>& other);
-	friend Matrix<T> operator-(Matrix<T> left, const Matrix<T>& other)
+	Matrix_ops<T>& operator-=(const Matrix_ops<T>& other);
+	/* Binary subtraction operator defined via compound assignment
+	 * and declared as a friend for operand symmetry */
+	friend Matrix_ops<T> operator-
+		(Matrix_ops<T> left, const Matrix_ops<T>& other)
 	{ return left -= other; };
 
-	// Multiplication operator
-	Matrix<T>& operator*=(const Matrix<T>& other);
-	friend Matrix<T> operator*(Matrix<T> left, const Matrix<T>& other)
+	// Matrix multiplication operator
+	Matrix_ops<T>& operator*=(const Matrix_ops<T>& other);
+	/* Binary matrix multiplication operator defined via compound assignment
+	 * and declared as a friend for operand symmetry */
+	friend Matrix_ops<T> operator*
+		(Matrix_ops<T> left, const Matrix_ops<T>& other)
 	{ return left *= other; };
 	
 	// Scalar multiplication operators
-	Matrix<T>& operator*=(const T& scalar);
-	friend Matrix<T> operator*(Matrix<T> left, const T& scalar)
+	Matrix_ops<T>& operator*=(const T& scalar);
+	/* Binary scalar multiplication operator defined via compound assignment
+	 * and declared as a friend for operand symmetry */
+	friend Matrix_ops<T> operator*(Matrix_ops<T> left, const T& scalar)
 	{ return left *= scalar; };
-	friend Matrix<T> operator*(const T& scalar, Matrix<T> right)
-	{ return right *= scalar; };
 
-	// Equality operators
-	bool operator==(const Matrix<T>& other) const;
-	bool operator!=(const Matrix<T>& other) const
+	// Equality operator
+	bool operator==(const Matrix_ops<T>& other) const;
+	// Inequality operator defined in terms of equality
+	bool operator!=(const Matrix_ops<T>& other) const
 	{ return !(*this == other); };
 };
 

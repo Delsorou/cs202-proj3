@@ -86,7 +86,6 @@ Matrix<T>::Matrix(const int r, const int c)
 {
 	// Initialize matrix dimensions
 	row = r, col = c;
-
 	// Create and intialize new zero matrix on heap of specified dimensions
 	mtx = new T*[r];
 	for (int i = 0; i < r; ++i)
@@ -127,8 +126,8 @@ Matrix<T>::Matrix(Matrix<T>&& other) noexcept
 	// Initialize dimension values to other matrix values
 	row = other.row, col = other.col;
 
-	// Reuse existing memory resource of temporary object
-	mtx = &other.mtx;
+	// Reuse existing memory resource
+	mtx = other.mtx;
 
 	// Zero other address in case of destruction
 	other.mtx = nullptr, other.row = 0, other.col = 0;
@@ -179,19 +178,27 @@ Matrix<T>& Matrix<T>::operator=(const Matrix<T>& other)
 FUNCTION:          operator=(Matrix<T>&& other)
 DESCRIPTION:       Move assignment operator for Matrix class
 RETURNS:           Matrix<T>&
-NOTES:             Memory leak on self-assignment (so don't do that)
+NOTES:             None
 ----------------------------------------------------------------------------- */
 template <class T>
 Matrix<T>& Matrix<T>::operator=(Matrix<T>&& other) noexcept
 {
-	// Copy other matrix dimension values
-	row = other.row, col = other.col;
+	if (this != &other)
+	{
+		// Free the existing resources
+		for (int i = 0; i < row; ++i)
+			delete[] mtx[i];
+		delete[] mtx;
 
-	// Move allocated memory directly
-	mtx = other.mtx;
+		// Copy other matrix dimension values
+		row = other.row, col = other.col;
+	
+		// Move memory resources directly
+		mtx = other.mtx;
 
-	// Zero other matrix storage pointer to prevent deallocation
-	other.mtx = nullptr, other.row = 0, other.col = 0;
+		// Zero other matrix storage pointer to prevent deallocation
+		other.mtx = nullptr, other.row = 0, other.col = 0;
+	}
 
 	// Whee, that was fast, thanks C++11 move semantics!
 	return *this;
@@ -259,25 +266,24 @@ std::istream& operator>>(std::istream& is, Matrix<T>& other)
 }
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          operator+=(const Matrix<T>& other)
+FUNCTION:          operator+=(const Matrix_ops<T>& other)
 DESCRIPTION:       Compound addition assignment operator for Matrix class
-RETURNS:           Matrix<T>&
+RETURNS:           Matrix_ops<T>&
 NOTES:             None
 ----------------------------------------------------------------------------- */
 template <class T>
-Matrix<T>& Matrix_ops<T>::operator+=(const Matrix<T>& other)
+Matrix_ops<T>& Matrix_ops<T>::operator+=(const Matrix_ops<T>& other)
 {
 	// Throw an exception if not suitable for addition
 	if (this->getRow() != other.getRow() || this->getCol() != other.getCol())
 		throw "Invalid operation (addition)...";
 
-	// Sum assign other matrix values element by element
 	for (int i = 0; i < this->getRow(); ++i)
 	{
 		for (int j = 0; j < this->getCol(); ++j)
 		{
-			T buffer = this->getElm(i, j) + other.getElm(i, j);
-			this->setElm(i, j, buffer);
+			// Add each entry 
+			this->setElm(i, j, this->getElm(i, j) + other.getElm(i, j));
 		}
 	}
 
@@ -285,25 +291,24 @@ Matrix<T>& Matrix_ops<T>::operator+=(const Matrix<T>& other)
 }
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          operatorc-=(const Matrix<T>& other)
+FUNCTION:          operator-=(const Matrix_ops<T>& other)
 DESCRIPTION:       Compound subtraction assignment operator for Matrix class
-RETURNS:           Matrix<T>&
+RETURNS:           Matrix_ops<T>&
 NOTES:             None
 ----------------------------------------------------------------------------- */
 template <class T>
-Matrix<T>& Matrix_ops<T>::operator-=(const Matrix<T>& other)
+Matrix_ops<T>& Matrix_ops<T>::operator-=(const Matrix_ops<T>& other)
 {
 	// Throw an exception if not suitable for subtraction
-	if (this->row != other.row || this->col != other.col)
+	if (this->getRow() != other.getRow() || this->getCol() != other.getCol())
 		throw "Invalid operation (subtraction)...";
 
-	// Difference assign other matrix values element by element
-	for (int i = 0; i < this->row; ++i)
+	for (int i = 0; i < this->getRow(); ++i)
 	{
-		for (int j = 0; j < this->col; ++j)
+		for (int j = 0; j < this->getCol(); ++j)
 		{
-			T buffer = this->getElm(i, j) - other.getElm(i, j);
-			this->setElm(i, j, buffer);
+			// Subtract each entry 
+			this->setElm(i, j, this->getElm(i, j) - other.getElm(i, j));
 		}
 	}
 
@@ -311,71 +316,89 @@ Matrix<T>& Matrix_ops<T>::operator-=(const Matrix<T>& other)
 }
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          operator*=(const Matrix<T>& other)
+FUNCTION:          operator*=(const Matrix_ops<T>& other)
 DESCRIPTION:       Compound multiplication assignment operator for Matrix class
-RETURNS:           Matrix<T>&
+RETURNS:           Matrix_ops<T>&
 NOTES:             None
 ----------------------------------------------------------------------------- */
 template <class T>
-Matrix<T>& Matrix_ops<T>::operator*=(const Matrix<T>& other)
+Matrix_ops<T>& Matrix_ops<T>::operator*=(const Matrix_ops<T>& other)
 {
 	// Throw an exception if not suitable for multiplication
-//	if (this->col != other.row)
-//		throw "Invalid operation (matrix multiplication)...";
+	if (this->getRow() != other.getCol())
+		throw "Invalid operation (matrix multiplication)...";
 
 	// Make a buffer object to hold the product
-//	Matrix_ops<T> product(this->row, other.col);
+	Matrix_ops<T> product(this->getRow(), other.getCol());
+
+	for (int i = 0; i < product.getRow(); ++i)
+	{
+		for (int j = 0; j < product.getCol(); ++j)
+		{
+			// Create a buffer object
+			T buffer = 0;
+			// Take the dot product and store it in buffer
+			for (int p = 0; p < other.getCol(); ++p)
+			{
+				buffer += this->getElm(i, p) * other.getElm(p, j);
+			}
+			// Set this entry to equal buffer
+			product.setElm(i, j, buffer);
+		}
+	}
+
+	*this = product;
 
 	return *this;
 }
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          operator*=(const Matrix<T>& scalar)
+FUNCTION:          operator*=(const Matrix_ops<T>& scalar)
 DESCRIPTION:       Compound scalar multiplication assignment operator
                    for Matrix class
-RETURNS:           Matrix<T>&
+RETURNS:           Matrix_ops<T>&
 NOTES:             None
 ----------------------------------------------------------------------------- */
 template <class T>
-Matrix<T>& Matrix_ops<T>::operator*=(const T& scalar)
+Matrix_ops<T>& Matrix_ops<T>::operator*=(const T& scalar)
 {
-	for (int i = 0; i < this->row; ++i)
+	for (int i = 0; i < this->getRow(); ++i)
 	{
-		for (int j = 0; j < this->col; ++j)
-			this->mtx[i][j] *= scalar;
+		for (int j = 0; j < this->getCol(); ++j)
+			this->setElm(i, j, this->getElm(i, j) * scalar);
 	}
 
 	return *this;
 }
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          operator==(const Matrix<T>& other)
+FUNCTION:          operator==(const Matrix_ops<T>& other)
 DESCRIPTION:       Compound addition assignment operator for Matrix class
-RETURNS:           Matrix<T>&
+RETURNS:           Matrix_ops<T>&
 NOTES:             None
 ----------------------------------------------------------------------------- */
 template <class T>
-bool Matrix_ops<T>::operator==(const Matrix<T>& other) const
+bool Matrix_ops<T>::operator==(const Matrix_ops<T>& other) const
 {
 	// Initialze boolean buffer for equality
 	bool isEqual = true;
 
 	// If row or column is not equal, it can't be equal
-	if (this->row != other.row || this->col != other.col)
+	if (this->getRow() != other.getRow() || this->getCol() != other.getCol())
 		isEqual = false;
 
 	// If any member is not equal, it's not equal (skip if already failed)
 	if (isEqual)
 	{
-		for (int i = 0; i < this->row; ++i)
+		for (int i = 0; i < this->getRow(); ++i)
 		{
-			for (int j = 0; j < this->col; ++j)
+			for (int j = 0; j < this->getCol(); ++j)
 			{
-				if (this->mtx[i][j] != other.mtx[i][j])
+				if (this->getElm(i, j) != other.getElm(i, j))
 					isEqual = false;
 			}
 		}
 	}
 
-	return *this;
+	return isEqual;
 }
