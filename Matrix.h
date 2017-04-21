@@ -92,7 +92,6 @@ public:
 	// Default constructor
 	Matrix_ops() : Matrix<T>()
 	{ }
-
 	// Derived class parameterized constructor
 	Matrix_ops(const int r, const int c) : Matrix<T>(r, c)
 	{ }
@@ -105,7 +104,7 @@ public:
 		(Matrix_ops<T> left, const Matrix_ops<T>& other)
 	{ return left += other; };
 
-	// Subtraction operator
+	// Subtraction compound assignment operator
 	Matrix_ops<T>& operator-=(const Matrix_ops<T>& other);
 	/* Binary subtraction operator defined via compound assignment
 	 * and declared as a friend for operand symmetry */
@@ -113,7 +112,7 @@ public:
 		(Matrix_ops<T> left, const Matrix_ops<T>& other)
 	{ return left -= other; };
 
-	// Matrix multiplication operator
+	// Matrix multiplication compound assignment operator
 	Matrix_ops<T>& operator*=(const Matrix_ops<T>& other);
 	/* Binary matrix multiplication operator defined via compound assignment
 	 * and declared as a friend for operand symmetry */
@@ -121,7 +120,7 @@ public:
 		(Matrix_ops<T> left, const Matrix_ops<T>& other)
 	{ return left *= other; };
 	
-	// Scalar multiplication operators
+	// Scalar multiplication compound assignment operator
 	Matrix_ops<T>& operator*=(const T& scalar);
 	/* Binary scalar multiplication operator defined via compound assignment
 	 * and declared as a friend for operand symmetry */
@@ -133,6 +132,12 @@ public:
 	// Inequality operator defined in terms of equality
 	bool operator!=(const Matrix_ops<T>& other) const
 	{ return !(*this == other); };
+
+	// Special matrix operations (will not modify self)
+	Matrix_ops<T> trans() const;
+	T det() const;
+	Matrix_ops<T> inv(const T determinate = det()) const;
+	Matrix_ops<T> solve() const;
 };
 
 // Include implementation file for template class design

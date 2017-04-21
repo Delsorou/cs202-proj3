@@ -17,6 +17,7 @@ Aaryna Irwin            2017-04-11         0.1
 ----------------------------------------------------------------------------- */
 
 #include <iostream>
+#include <utility>
 #include <iomanip>
 #include <limits>
 
@@ -86,6 +87,7 @@ Matrix<T>::Matrix(const int r, const int c)
 {
 	// Initialize matrix dimensions
 	row = r, col = c;
+
 	// Create and intialize new zero matrix on heap of specified dimensions
 	mtx = new T*[r];
 	for (int i = 0; i < r; ++i)
@@ -126,10 +128,10 @@ Matrix<T>::Matrix(Matrix<T>&& other) noexcept
 	// Initialize dimension values to other matrix values
 	row = other.row, col = other.col;
 
-	// Reuse existing memory resource
+	// Exchange existing memory resources
 	mtx = other.mtx;
 
-	// Zero other address in case of destruction
+	// Zero other matrix so it won't index empty memory
 	other.mtx = nullptr, other.row = 0, other.col = 0;
 }
 
@@ -183,22 +185,12 @@ NOTES:             None
 template <class T>
 Matrix<T>& Matrix<T>::operator=(Matrix<T>&& other) noexcept
 {
-	if (this != &other)
-	{
-		// Free the existing resources
-		for (int i = 0; i < row; ++i)
-			delete[] mtx[i];
-		delete[] mtx;
-
-		// Copy other matrix dimension values
-		row = other.row, col = other.col;
+	// Copy matrix dimension values
+	std::swap(row, other.row);
+   	std::swap(col, other.col);
 	
-		// Move memory resources directly
-		mtx = other.mtx;
-
-		// Zero other matrix storage pointer to prevent deallocation
-		other.mtx = nullptr, other.row = 0, other.col = 0;
-	}
+	// Move memory resources directly
+	std::swap(mtx, other.mtx);
 
 	// Whee, that was fast, thanks C++11 move semantics!
 	return *this;
@@ -324,21 +316,24 @@ NOTES:             None
 template <class T>
 Matrix_ops<T>& Matrix_ops<T>::operator*=(const Matrix_ops<T>& other)
 {
+	// Create local dimension buffers to reduce function calls
+	int rowB = this->getRow(), colB = other.getCol();
+
 	// Throw an exception if not suitable for multiplication
-	if (this->getRow() != other.getCol())
+	if (rowB != colB)
 		throw "Invalid operation (matrix multiplication)...";
-
+	
 	// Make a buffer object to hold the product
-	Matrix_ops<T> product(this->getRow(), other.getCol());
+	Matrix_ops<T> product(rowB, colB);
 
-	for (int i = 0; i < product.getRow(); ++i)
+	for (int i = 0; i < rowB; ++i)
 	{
-		for (int j = 0; j < product.getCol(); ++j)
+		for (int j = 0; j < colB; ++j)
 		{
 			// Create a buffer object
 			T buffer = 0;
 			// Take the dot product and store it in buffer
-			for (int p = 0; p < other.getCol(); ++p)
+			for (int p = 0; p < colB; ++p)
 			{
 				buffer += this->getElm(i, p) * other.getElm(p, j);
 			}
@@ -347,7 +342,8 @@ Matrix_ops<T>& Matrix_ops<T>::operator*=(const Matrix_ops<T>& other)
 		}
 	}
 
-	*this = product;
+	// Force move self-assignment from local buffer (much faster)
+	*this = std::move(product);
 
 	return *this;
 }
@@ -401,4 +397,58 @@ bool Matrix_ops<T>::operator==(const Matrix_ops<T>& other) const
 	}
 
 	return isEqual;
+}
+
+/* -----------------------------------------------------------------------------
+FUNCTION:          trans()
+DESCRIPTION:       Returns the transpose of this matrix
+RETURNS:           Matrix_ops<T>
+NOTES:             None
+----------------------------------------------------------------------------- */
+template <class T>
+Matrix_ops<T> Matrix_ops<T>::trans() const
+{
+	Matrix_ops<T> transpose(this->getCol(), this->getRow());
+
+	for (int i = 0; i < transpose.getRow(); ++i)
+	{
+		for (int j = 0; j < transpose.getCol(); ++j)
+			transpose.setElm(i, j, this->getElm(j, i));
+	}
+
+	return transpose;
+}
+
+/* -----------------------------------------------------------------------------
+FUNCTION:          det()
+DESCRIPTION:       Returns the determinant of this matrix
+RETURNS:           T
+NOTES:             None
+----------------------------------------------------------------------------- */
+template <class T>
+T Matrix_ops<T>::det() const
+{
+	int rowB = this->getRow(), colB = this->getCol();
+
+	if (rowB != colB)
+		throw "Invalid operation (nonsquare)";
+
+	return *this;
+}
+
+/* -----------------------------------------------------------------------------
+FUNCTION:          inv()
+DESCRIPTION:       Returns the inverse of this matrix
+RETURNS:           Matrix_ops<T>
+NOTES:             None
+----------------------------------------------------------------------------- */
+template <class T>
+Matrix_ops<T> Matrix_ops<T>::inv(const T determinate) const
+{
+	int rowB = this->getRow(), colB = this->getCol();
+
+	if (rowB != colB)
+		throw "Invalid operation (nonsquare)";
+	
+	return *this;
 }

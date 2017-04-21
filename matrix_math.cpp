@@ -40,6 +40,7 @@ int main(int argc, char* argv[])
 	std::cout << test_bed[2] * test_bed[3];
 	test_bed[2] *= test_bed[3];
 	std::cout << test_bed[2];
+	std::cout << test_bed[2].trans();
 	std::cout << "Demonstrate equality and inequality\n";
 	std::cout << std::boolalpha << (test_bed[0] == test_bed[1]) << std::endl
 		<< (test_bed[0] != test_bed[1]);
