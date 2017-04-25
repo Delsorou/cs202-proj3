@@ -35,7 +35,7 @@ template <class T>
 class Matrix
 {
 	// Matrix dimension values
-	int row, col;
+	std::size_t row, col;
 	// Matrix array storage pointer (template type)
 	T **mtx;
 
@@ -47,8 +47,8 @@ class Matrix
 public:
 	// Constructor (Default)
 	Matrix();
-	// Constructor (Parameterized) (int row, int col)
-	Matrix(const int r, const int c);
+	// Constructor (Parameterized) (row, col)
+	Matrix(const std::size_t r, const std::size_t c);
 	// Constructor (Copy)
 	Matrix(const Matrix<T>& other);
 	// Constructor (Move) (rvalue reference)
@@ -57,19 +57,19 @@ public:
 	virtual ~Matrix();
 
 	// Row dimension accessor (inline)
-	int getRow() const
+	std::size_t getRow() const
 	{ return row; };
 
 	// Column dimension accessor (inline)
-	int getCol() const
+	std::size_t getCol() const
 	{ return col; };
 
 	// Matrix element mutator function (row, col, val) (inline)
-	void setElm(const int r, const int c, const T k)
+	void setElm(const std::size_t r, const std::size_t c, const T k)
 	{ mtx[r][c] = k; };
 
 	// Matrix element accessor function (row, col) (inline)
-	T getElm(const int r, const int c) const
+	T getElm(const std::size_t r, const std::size_t c) const
 	{ return mtx[r][c]; };
 
 	// Assignment operator (Copy)
@@ -93,7 +93,7 @@ public:
 	Matrix_ops() : Matrix<T>()
 	{ }
 	// Derived class parameterized constructor
-	Matrix_ops(const int r, const int c) : Matrix<T>(r, c)
+	Matrix_ops(const std::size_t r, const std::size_t c) : Matrix<T>(r, c)
 	{ }
 	
 	// Addition compound assignment operator

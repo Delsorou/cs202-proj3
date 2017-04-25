@@ -50,13 +50,13 @@ template <class T>
 void Matrix<T>::resize(const Matrix<T>& other)
 {
 	// Delete existing matrix arrays from heap
-	for (int i = 0; i < row; ++i)
+	for (std::size_t i = 0; i < row; ++i)
 		delete[] mtx[i];
 	delete[] mtx;
 
 	// Create and initialize new matrix array of specified dimensions on heap
 	mtx = new T*[other.row];
-	for (int i = 0; i < other.row; ++i)
+	for (std::size_t i = 0; i < other.row; ++i)
 		mtx[i] = new T[other.col] { 0 };
 }
 
@@ -77,20 +77,20 @@ Matrix<T>::Matrix()
 }
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          Matrix(const int r, const int c)
+FUNCTION:          Matrix(const size_t r, const size_t c)
 DESCRIPTION:       Constructs zero matrix of specified row, column dimensions
 RETURNS:           N/A
 NOTES:             None
 ----------------------------------------------------------------------------- */
 template <class T>
-Matrix<T>::Matrix(const int r, const int c)
+Matrix<T>::Matrix(const std::size_t r, const std::size_t c)
 {
 	// Initialize matrix dimensions
 	row = r, col = c;
 
-	// Create and intialize new zero matrix on heap of specified dimensions
+	// Create and initialize new zero matrix on heap of specified dimensions
 	mtx = new T*[r];
-	for (int i = 0; i < r; ++i)
+	for (std::size_t i = 0; i < r; ++i)
 		mtx[i] = new T[c] { 0 };
 }
 
@@ -108,10 +108,10 @@ Matrix<T>::Matrix(const Matrix<T>& other)
 
 	// Create new matrix of other dimensions and copy each element
 	mtx = new T*[row];
-	for (int i = 0; i < row; ++i)
+	for (std::size_t i = 0; i < row; ++i)
 	{
 		mtx[i] = new T[col];
-		for (int j = 0; j < col; ++j)
+		for (std::size_t j = 0; j < col; ++j)
 			mtx[i][j] = other.mtx[i][j];
 	}
 }
@@ -145,7 +145,7 @@ template <class T>
 Matrix<T>::~Matrix()
 {
 	// Delete deez nuts
-	for (int i = 0; i < row; ++i)
+	for (std::size_t i = 0; i < row; ++i)
 		delete[] mtx[i];
 	delete[] mtx;
 }
@@ -167,9 +167,9 @@ Matrix<T>& Matrix<T>::operator=(const Matrix<T>& other)
 	row = other.row, col = other.col;
 
 	// Copy other matrix values element by element
-	for (int i = 0; i < row; ++i)
+	for (std::size_t i = 0; i < row; ++i)
 	{
-		for (int j = 0; j < col; ++j)
+		for (std::size_t j = 0; j < col; ++j)
 			mtx[i][j] = other.mtx[i][j];
 	}
 
@@ -211,9 +211,9 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& other)
 		<< std::right << std::endl;
 
 	// Insert the matrix, row per line
-	for (int i = 0; i < other.row; ++i)
+	for (std::size_t i = 0; i < other.row; ++i)
 	{
-		for (int j = 0; j < other.col; ++j)
+		for (std::size_t j = 0; j < other.col; ++j)
 			os << FLD << other.mtx[i][j] << ' ';
 		os << std::endl;
 	}
@@ -248,9 +248,9 @@ std::istream& operator>>(std::istream& is, Matrix<T>& other)
 	other.row = buffR, other.col = buffC;
 
 	// Extract the matrix entries, element by element
-	for (int i = 0; i < other.row; ++i)
+	for (std::size_t i = 0; i < other.row; ++i)
 	{
-		for (int j = 0; j < other.col; ++j)
+		for (std::size_t j = 0; j < other.col; ++j)
 			is >> other.mtx[i][j];
 	}
 
@@ -270,9 +270,9 @@ Matrix_ops<T>& Matrix_ops<T>::operator+=(const Matrix_ops<T>& other)
 	if (this->getRow() != other.getRow() || this->getCol() != other.getCol())
 		throw "Invalid operation (addition)...";
 
-	for (int i = 0; i < this->getRow(); ++i)
+	for (std::size_t i = 0; i < this->getRow(); ++i)
 	{
-		for (int j = 0; j < this->getCol(); ++j)
+		for (std::size_t j = 0; j < this->getCol(); ++j)
 		{
 			// Add each entry 
 			this->setElm(i, j, this->getElm(i, j) + other.getElm(i, j));
@@ -295,9 +295,9 @@ Matrix_ops<T>& Matrix_ops<T>::operator-=(const Matrix_ops<T>& other)
 	if (this->getRow() != other.getRow() || this->getCol() != other.getCol())
 		throw "Invalid operation (subtraction)...";
 
-	for (int i = 0; i < this->getRow(); ++i)
+	for (std::size_t i = 0; i < this->getRow(); ++i)
 	{
-		for (int j = 0; j < this->getCol(); ++j)
+		for (std::size_t j = 0; j < this->getCol(); ++j)
 		{
 			// Subtract each entry 
 			this->setElm(i, j, this->getElm(i, j) - other.getElm(i, j));
@@ -317,7 +317,7 @@ template <class T>
 Matrix_ops<T>& Matrix_ops<T>::operator*=(const Matrix_ops<T>& other)
 {
 	// Create local dimension buffers to reduce function calls
-	int rowB = this->getRow(), colB = other.getCol();
+	std::size_t rowB = this->getRow(), colB = other.getCol();
 
 	// Throw an exception if not suitable for multiplication
 	if (rowB != colB)
@@ -326,14 +326,14 @@ Matrix_ops<T>& Matrix_ops<T>::operator*=(const Matrix_ops<T>& other)
 	// Make a buffer object to hold the product
 	Matrix_ops<T> product(rowB, colB);
 
-	for (int i = 0; i < rowB; ++i)
+	for (std::size_t i = 0; i < rowB; ++i)
 	{
-		for (int j = 0; j < colB; ++j)
+		for (std::size_t j = 0; j < colB; ++j)
 		{
 			// Create a buffer object
 			T buffer = 0;
 			// Take the dot product and store it in buffer
-			for (int p = 0; p < colB; ++p)
+			for (std::size_t p = 0; p < colB; ++p)
 			{
 				buffer += this->getElm(i, p) * other.getElm(p, j);
 			}
@@ -358,9 +358,9 @@ NOTES:             None
 template <class T>
 Matrix_ops<T>& Matrix_ops<T>::operator*=(const T& scalar)
 {
-	for (int i = 0; i < this->getRow(); ++i)
+	for (std::size_t i = 0; i < this->getRow(); ++i)
 	{
-		for (int j = 0; j < this->getCol(); ++j)
+		for (std::size_t j = 0; j < this->getCol(); ++j)
 			this->setElm(i, j, this->getElm(i, j) * scalar);
 	}
 
@@ -386,9 +386,9 @@ bool Matrix_ops<T>::operator==(const Matrix_ops<T>& other) const
 	// If any member is not equal, it's not equal (skip if already failed)
 	if (isEqual)
 	{
-		for (int i = 0; i < this->getRow(); ++i)
+		for (std::size_t i = 0; i < this->getRow(); ++i)
 		{
-			for (int j = 0; j < this->getCol(); ++j)
+			for (std::size_t j = 0; j < this->getCol(); ++j)
 			{
 				if (this->getElm(i, j) != other.getElm(i, j))
 					isEqual = false;
@@ -410,9 +410,9 @@ Matrix_ops<T> Matrix_ops<T>::trans() const
 {
 	Matrix_ops<T> transpose(this->getCol(), this->getRow());
 
-	for (int i = 0; i < transpose.getRow(); ++i)
+	for (std::size_t i = 0; i < transpose.getRow(); ++i)
 	{
-		for (int j = 0; j < transpose.getCol(); ++j)
+		for (std::size_t j = 0; j < transpose.getCol(); ++j)
 			transpose.setElm(i, j, this->getElm(j, i));
 	}
 
@@ -428,7 +428,7 @@ NOTES:             None
 template <class T>
 T Matrix_ops<T>::det() const
 {
-	int rowB = this->getRow(), colB = this->getCol();
+	std::size_t rowB = this->getRow(), colB = this->getCol();
 
 	if (rowB != colB)
 		throw "Invalid operation (nonsquare)";
@@ -445,7 +445,7 @@ NOTES:             None
 template <class T>
 Matrix_ops<T> Matrix_ops<T>::inv(const T determinate) const
 {
-	int rowB = this->getRow(), colB = this->getCol();
+	std::size_t rowB = this->getRow(), colB = this->getCol();
 
 	if (rowB != colB)
 		throw "Invalid operation (nonsquare)";
