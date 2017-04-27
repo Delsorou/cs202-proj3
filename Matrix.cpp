@@ -370,7 +370,7 @@ Matrix_ops<T>& Matrix_ops<T>::operator*=(const T& scalar)
 /* -----------------------------------------------------------------------------
 FUNCTION:          operator==(const Matrix_ops<T>& other)
 DESCRIPTION:       Compound addition assignment operator for Matrix class
-RETURNS:           Matrix_ops<T>&
+RETURNS:           bool
 NOTES:             None
 ----------------------------------------------------------------------------- */
 template <class T>
@@ -403,7 +403,7 @@ bool Matrix_ops<T>::operator==(const Matrix_ops<T>& other) const
 FUNCTION:          trans()
 DESCRIPTION:       Returns the transpose of this matrix
 RETURNS:           Matrix_ops<T>
-NOTES:             None
+NOTES:             Returns temporary, does not modify object
 ----------------------------------------------------------------------------- */
 template <class T>
 Matrix_ops<T> Matrix_ops<T>::trans() const
