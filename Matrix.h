@@ -10,18 +10,13 @@ COMPILER:          gcc 5.4.0
 
 NOTES:             None
 
-MODIFICATION HISTORY:
-
-Author                  Date               Version
----------------         ----------         --------------
-Aaryna Irwin            2017-04-11         0.1
-
 ----------------------------------------------------------------------------- */
 
+#define ELM(r,c) matrix.getElm(r, c)
 #define FLD std::setw(5)
 #include <iostream>
 
-// Forward declare the class for I/O operator prototype parameter list
+// Forward declare the class for I/O operator prototype list
 template <class T>
 class Matrix;
 
@@ -133,11 +128,11 @@ public:
 	bool operator!=(const Matrix_ops<T>& other) const
 	{ return !(*this == other); };
 
-	// Special matrix operations (will not modify self)
-	Matrix_ops<T> trans() const;
-	T det() const;
-	Matrix_ops<T> inv(const T determinate = det()) const;
-	Matrix_ops<T> solve() const;
+	// Special matrix operations
+	Matrix_ops<T>& trans();
+	T det(const Matrix_ops<T>& matrix) const;
+//	Matrix_ops<T> inv() const;
+//	Matrix_ops<T> solve() const;
 };
 
 // Include implementation file for template class design

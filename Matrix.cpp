@@ -358,6 +358,15 @@ NOTES:             None
 template <class T>
 Matrix_ops<T>& Matrix_ops<T>::operator*=(const T& scalar)
 {
+	// Eliminate obvious cases
+	if (scalar == 1) return *this;
+	else if (scalar == 0)
+	{
+		Matrix_ops<T> zero(this->getRow(), this->getCol());
+		*this = std::move(zero);
+		return *this;
+	}	
+
 	for (std::size_t i = 0; i < this->getRow(); ++i)
 	{
 		for (std::size_t j = 0; j < this->getCol(); ++j)
@@ -401,13 +410,14 @@ bool Matrix_ops<T>::operator==(const Matrix_ops<T>& other) const
 
 /* -----------------------------------------------------------------------------
 FUNCTION:          trans()
-DESCRIPTION:       Returns the transpose of this matrix
-RETURNS:           Matrix_ops<T>
-NOTES:             Returns temporary, does not modify object
+DESCRIPTION:       Transposes the matrix
+RETURNS:           Matrix_ops<T>&
+NOTES:             None
 ----------------------------------------------------------------------------- */
 template <class T>
-Matrix_ops<T> Matrix_ops<T>::trans() const
+Matrix_ops<T>& Matrix_ops<T>::trans()
 {
+	// Create a local buffer to store the transpose
 	Matrix_ops<T> transpose(this->getCol(), this->getRow());
 
 	for (std::size_t i = 0; i < transpose.getRow(); ++i)
@@ -416,7 +426,10 @@ Matrix_ops<T> Matrix_ops<T>::trans() const
 			transpose.setElm(i, j, this->getElm(j, i));
 	}
 
-	return transpose;
+	// Copy local buffer using move semantics
+	*this = std::move(transpose);
+
+	return *this;
 }
 
 /* -----------------------------------------------------------------------------
@@ -426,29 +439,49 @@ RETURNS:           T
 NOTES:             None
 ----------------------------------------------------------------------------- */
 template <class T>
-T Matrix_ops<T>::det() const
+T Matrix_ops<T>::det(const Matrix_ops<T>& matrix) const
 {
-	std::size_t rowB = this->getRow(), colB = this->getCol();
+	std::size_t rowB = matrix.getRow(), colB = matrix.getCol();
 
+	// Eliminate invalid and base cases
 	if (rowB != colB)
 		throw "Invalid operation (nonsquare)";
+	else if (rowB == 1) return ELM(1,1);
+	else if (rowB == 2)	return ELM(1,1) * ELM(2,2) - ELM(2,1) * ELM(1,2); 
+	else if (rowB == 3)
+	{
+		return
+		{
+			(ELM(1,3) * ELM(2,1) * ELM(3,2)
+			 + ELM(1,1) * ELM(2,2) * ELM(3,3)
+			 + ELM(1,2) * ELM(2,3) * ELM(3,1))
+			- (ELM(3,3) * ELM(2,1) * ELM(1,2)
+			 + ELM(3,1) * ELM(2,2) * ELM(1,3)
+			 + ELM(3,2) * ELM(2,3) * ELM(1,1))
+		};
+	}
 
-	return *this;
-}
+	// Well, we got this far, so time for another round of minors
+	Matrix_ops<T> minor[rowB] = new Matrix_ops<T>(rowB - 1, colB - 1);
 
-/* -----------------------------------------------------------------------------
-FUNCTION:          inv()
-DESCRIPTION:       Returns the inverse of this matrix
-RETURNS:           Matrix_ops<T>
-NOTES:             None
------------------------------------------------------------------------------ */
-template <class T>
-Matrix_ops<T> Matrix_ops<T>::inv(const T determinate) const
-{
-	std::size_t rowB = this->getRow(), colB = this->getCol();
+	for (std::size_t n = 0; n < colB; ++n)
+	{
+		for (std::size_t i = 0; i < rowB - 1; ++i)
+		{
+			for (std::size_t j = 0; j < colB - 1; ++j)
+			{
+				if (n <= j) minor[n].setElm(i, j, ELM(i,j + 1));
+				else minor[n].setElm(i, j, ELM(i,j));
+			}
+		}
+	}
 
-	if (rowB != colB)
-		throw "Invalid operation (nonsquare)";
-	
-	return *this;
+	T determinant = 0;
+	for (std::size_t i = 0; i < rowB; ++i)
+	{
+		if ((rowB + i) % 2 != 0) determinant += det(minor[i]);
+		else determinant += det(minor[i] * -1);
+	}
+
+	return determinant;
 }
