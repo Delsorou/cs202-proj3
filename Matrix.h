@@ -129,10 +129,10 @@ public:
 	{ return !(*this == other); };
 
 	// Special matrix operations
+	T solve(const Matrix_ops<T>& matrix) const;
+	T det(Matrix_ops<T>& matrix);
+	Matrix_ops<T>& inv(T determinant = 0);
 	Matrix_ops<T>& trans();
-	T det(const Matrix_ops<T>& matrix) const;
-//	Matrix_ops<T> inv() const;
-//	Matrix_ops<T> solve() const;
 };
 
 // Include implementation file for template class design
