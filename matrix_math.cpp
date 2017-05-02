@@ -19,6 +19,8 @@ Aaryna Irwin            2017-04-11         0.1
 #include <cstring>
 #include <fstream>
 #include "Matrix.h"
+#define ITEM std::left << std::setw(6)
+#define DESC std::right << std::setw(31)
 
 // Function prototypes 
 template <class T>
@@ -123,16 +125,16 @@ int main(int argc, char* argv[])
 //			std::cout << "Inverse:  " << std::endl;
 //			std::cout << mat1.inv() << std::endl;
 //		}
-///
-//		if (strcmp(*argv, "-det") == 0)
-//		{
-//			err = read_matrix(mat1, --argc, *++argv);
-//			if (err) return err;
-//
-//			std::cout << "Determinant:  " << std::endl;
-//			std::cout << Matrix_ops::det(mat1) << std::endl;
-//		}
-//
+
+		if (strcmp(*argv, "-det") == 0)
+		{
+			err = read_matrix(mat1, --argc, *++argv);
+			if (err) return err;
+
+			std::cout << "Determinant:  " << std::endl;
+			std::cout << mat1.det() << std::endl;
+		}
+
 //		if (strcmp(*argv, "-solve") == 0)
 //		{
 //			err = read_matrix(mat1, --argc, *++argv);
@@ -237,19 +239,19 @@ void display_help()
 {
 	using std::cout;
 	using std::endl;
-	cout << endl << "Matrix Math Demonstration Program...\n\n";
+	cout << std::left << endl << "Matrix Math Demonstration Program...\n\n";
 	cout << "Usage: matrix_math [-arg] [filename(s)] ... [-out] [filename]\n\n";
 	cout << "Arguments:\n\n";
-	cout << std::setw(15) << "-h" << std::setw(15) << "Display this help file\n";
-	cout << std::setw(15) << "-inp" << std::setw(15) << "Display matrix\n";
-	cout << std::setw(15) << "-out" << std::setw(15) << "Save results\n";
-	cout << std::setw(15) << "-add" << std::setw(15) << "Add matrices\n";
-	cout << std::setw(15) << "-sub" << std::setw(15) << "Subtract matrices\n";
-	cout << std::setw(15) << "-mul" << std::setw(15) << "Multiply mattices\n";
-	cout << std::setw(15) << "-eq" << std::setw(15)
-		<< "Test matrices for equality\n";
-	cout << std::setw(15) << "-T" << std::setw(15) << "Display transpose\n";
-	cout << std::setw(15) << "-1" << std::setw(15) << "Display inverse\n";
-	cout << std::setw(15) << "-det" << std::setw(15) << "Display determinant\n";
-	cout << std::setw(15) << "-solve" << std::setw(15) << "Attempt to solve provided matrix as a set of equations\n";
+	cout << ITEM << "-h" << DESC << "   Display this help file\n";
+	cout << ITEM << "-inp" << DESC << "   Display matrix\n";
+	cout << ITEM << "-out" << DESC << "   Save results\n";
+	cout << ITEM << "-add" << DESC << "   Add matrices\n";
+	cout << ITEM << "-sub" << DESC << "   Subtract matrices\n";
+	cout << ITEM << "-mul" << DESC << "   Multiply mattices\n";
+	cout << ITEM << "-eq" << DESC << "   Test matrices for equality\n";
+	cout << ITEM << "-T" << DESC << "   Display transpose\n";
+	cout << ITEM << "-1" << DESC << "   Display inverse\n";
+	cout << ITEM << "-det" << DESC	<< "   Display determinant\n";
+	cout << ITEM << "-solve" << DESC 
+		<< "   Attempt to solve as a set of equations\n";
 }

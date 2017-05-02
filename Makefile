@@ -13,7 +13,7 @@
 # ------------------------------------------------------------------------------
 
 CC=g++
-CFLAGS=-c -Wall -std=c++11
+CFLAGS=-g -c -Wall -std=c++11
 LDFLAGS=
 SOURCES=matrix_math.cpp
 OBJECTS=$(SOURCES:.cpp=.o)

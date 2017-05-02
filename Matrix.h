@@ -12,7 +12,7 @@ NOTES:             None
 
 ----------------------------------------------------------------------------- */
 
-#define ELM(r,c) matrix.getElm(r, c)
+#define ELM(r,c) this->getElm(r, c)
 #define FLD std::setw(5)
 #include <iostream>
 
@@ -130,8 +130,8 @@ public:
 
 	// Special matrix operations
 	T solve(const Matrix_ops<T>& matrix) const;
-	T det(Matrix_ops<T>& matrix);
-	Matrix_ops<T>& inv(T determinant = 0);
+	T det();
+	Matrix_ops<T>& inv();
 	Matrix_ops<T>& trans();
 };
 

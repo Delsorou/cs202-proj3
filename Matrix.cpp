@@ -439,58 +439,52 @@ RETURNS:           T
 NOTES:             Matrix becomes matrix of minors
 ----------------------------------------------------------------------------- */
 template <class T>
-T Matrix_ops<T>::det(Matrix_ops<T>& matrix)
+T Matrix_ops<T>::det()
 {
-//	std::size_t rowB = matrix.getRow(), colB = matrix.getCol();
-//	static Matrix_ops<T> matOfMin(rowB, colB);
-//	
-//	// Eliminate invalid and base cases
-//	if (rowB != colB || rowB == 0)
-//		throw "Invalid operation (determinant)";
-//	else if (rowB == 1)
-//	{
-//		matOfMin(1, 1) =
-//		return ELM(1,1);
-//	}
-//	else if (rowB == 2)	return ELM(1,1) * ELM(2,2) - ELM(2,1) * ELM(1,2); 
-//	else if (rowB == 3)
-//	{
-//		return
-//		{
-//			(ELM(1,3) * ELM(2,1) * ELM(3,2)
-//			 + ELM(1,1) * ELM(2,2) * ELM(3,3)
-//			 + ELM(1,2) * ELM(2,3) * ELM(3,1))
-//			- (ELM(3,3) * ELM(2,1) * ELM(1,2)
-//			 + ELM(3,1) * ELM(2,2) * ELM(1,3)
-//			 + ELM(3,2) * ELM(2,3) * ELM(1,1))
-//		};
-//	}
-//
-//	// Well, we got this far, so time for another round of minors
-//	Matrix_ops<T> minor[rowB] = new Matrix_ops<T>(rowB - 1, colB - 1);
-//
-//	for (std::size_t n = 0; n < colB; ++n)
-//	{
-//		for (std::size_t i = 0; i < rowB - 1; ++i)
-//		{
-//			for (std::size_t j = 0; j < colB - 1; ++j)
-//			{
-//				if (n <= j) minor[n].setElm(i, j, ELM(i,j + 1));
-//				else minor[n].setElm(i, j, ELM(i,j));
-//			}
-//		}
-//	}
-//
-//	T determinant = 0;
-//	for (std::size_t i = 0; i < rowB; ++i)
-//	{
-//		if ((rowB + i) % 2 == 0) determinant += det(minor[i]);
-//		else determinant += det(minor[i] * -1);
-//	}
-//
-//	matrix = std::move(matOfMin);
-//
-//	return determinant;
+	std::size_t rowB = this->getRow(), colB = this->getCol();
+	
+	// Eliminate invalid and base cases
+	if (rowB != colB || rowB == 0)
+		throw "Invalid operation (determinant)";
+	else if (rowB == 1)	return ELM(1,1);
+	else if (rowB == 2)	return ELM(1,1) * ELM(2,2) - ELM(2,1) * ELM(1,2); 
+	else if (rowB == 3)
+	{
+		return
+		{
+			(ELM(1,3) * ELM(2,1) * ELM(3,2)
+			 + ELM(1,1) * ELM(2,2) * ELM(3,3)
+			 + ELM(1,2) * ELM(2,3) * ELM(3,1))
+			- (ELM(3,3) * ELM(2,1) * ELM(1,2)
+			 + ELM(3,1) * ELM(2,2) * ELM(1,3)
+			 + ELM(3,2) * ELM(2,3) * ELM(1,1))
+		};
+	}
+
+	// Well, we got this far, so time for another round of minors
+	Matrix_ops<T>* minor[rowB] { new Matrix_ops<T>(rowB - 1, colB - 1) };
+
+	for (std::size_t n = 0; n < colB; ++n)
+	{
+		for (std::size_t i = 0; i < rowB - 1; ++i)
+		{
+			for (std::size_t j = 0; j < colB - 1; ++j)
+			{
+				if (n <= j) minor[n]->setElm(i, j, ELM(i,j + 1));
+				else minor[n]->setElm(i, j, ELM(i,j));
+			}
+		}
+	}
+
+	T determinant = 0;
+	for (std::size_t i = 0; i < rowB; ++i)
+	{
+		if ((rowB + i) % 2 == 0) determinant += minor[i]->det();
+		else determinant += minor[i]->det() * -1;
+	}
+
+	for (Matrix_ops<T>* i : minor) delete i;
+	return determinant;
 }
 
 /* -----------------------------------------------------------------------------
@@ -500,7 +494,7 @@ RETURNS:           Matrix_ops<T>&
 NOTES:             None
 ----------------------------------------------------------------------------- */
 template <class T>
-Matrix_ops<T>& Matrix_ops<T>::inv(T determinant)
+Matrix_ops<T>& Matrix_ops<T>::inv()
 {
 //	if (determinant == 0)
 //		throw "Invalid operation (inverse)...";
