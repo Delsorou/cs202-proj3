@@ -446,23 +446,25 @@ T Matrix_ops<T>::det()
 	// Eliminate invalid and base cases
 	if (rowB != colB || rowB == 0)
 		throw "Invalid operation (determinant)";
-	else if (rowB == 1)	return ELM(1,1);
-	else if (rowB == 2)	return ELM(1,1) * ELM(2,2) - ELM(2,1) * ELM(1,2); 
+	else if (rowB == 1)	return ELM(0,0);
+	else if (rowB == 2)	return ELM(0,0) * ELM(1,1) - ELM(1,0) * ELM(0,1); 
 	else if (rowB == 3)
 	{
 		return
 		{
-			(ELM(1,3) * ELM(2,1) * ELM(3,2)
-			 + ELM(1,1) * ELM(2,2) * ELM(3,3)
-			 + ELM(1,2) * ELM(2,3) * ELM(3,1))
-			- (ELM(3,3) * ELM(2,1) * ELM(1,2)
-			 + ELM(3,1) * ELM(2,2) * ELM(1,3)
-			 + ELM(3,2) * ELM(2,3) * ELM(1,1))
+			(ELM(0,2) * ELM(1,0) * ELM(2,1)
+			 + ELM(0,0) * ELM(1,1) * ELM(2,2)
+			 + ELM(0,1) * ELM(1,2) * ELM(2,0))
+			- (ELM(2,2) * ELM(1,0) * ELM(0,1)
+			 + ELM(2,0) * ELM(1,1) * ELM(0,2)
+			 + ELM(2,1) * ELM(1,2) * ELM(0,0))
 		};
 	}
 
 	// Well, we got this far, so time for another round of minors
-	Matrix_ops<T>* minor[rowB] { new Matrix_ops<T>(rowB - 1, colB - 1) };
+	Matrix_ops<T>* minor[rowB];
+	for (std::size_t i = 0; i < rowB; ++i)
+	   	minor[i] = new Matrix_ops<T>(rowB - 1, colB - 1);
 
 	for (std::size_t n = 0; n < colB; ++n)
 	{
@@ -483,7 +485,7 @@ T Matrix_ops<T>::det()
 		else determinant += minor[i]->det() * -1;
 	}
 
-	for (Matrix_ops<T>* i : minor) delete i;
+	for (std::size_t i = 0; i < rowB; ++i) delete minor[i];
 	return determinant;
 }
 
