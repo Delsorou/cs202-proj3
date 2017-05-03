@@ -69,6 +69,7 @@ int main(int argc, char* argv[])
 
 			mat3 = mat1 + mat2;
 			std::cout << "Sum:  " << std::endl;
+			std::cout << mat1 << std::endl << '+' << mat2 << std::endl << '=';
 			std::cout << mat3 << std::endl;
 		}
 		
@@ -81,6 +82,7 @@ int main(int argc, char* argv[])
 
 			mat3 = mat1 - mat2;
 			std::cout << "Difference:  " << std::endl;
+			std::cout << mat1 << std::endl << '-' << mat2 << std::endl << '=';
 			std::cout << mat3 << std::endl;
 		}
 
@@ -93,6 +95,7 @@ int main(int argc, char* argv[])
 
 			mat3 = mat1 * mat2;
 			std::cout << "Product:  " << std::endl;
+			std::cout << mat1 << std::endl << 'x' << mat2 << std::endl << '=';
 			std::cout << mat3 << std::endl;
 		}
 		
@@ -104,6 +107,7 @@ int main(int argc, char* argv[])
 			if (err) return err;
 
 			bool equality = mat1 == mat2;
+			std::cout << mat1 << std::endl << mat2 << std::endl;
 			std::cout << "Equality:  " << std::endl;
 			std::cout << std::boolalpha << equality << std::endl;
 		}
@@ -113,6 +117,7 @@ int main(int argc, char* argv[])
 			err = read_matrix(mat1, --argc, *++argv);
 			if (err) return err;
 
+			std::cout << mat1 << std::endl;
 			std::cout << "Transpose:  " << std::endl;
 			std::cout << mat1.trans() << std::endl;
 		}
@@ -131,6 +136,7 @@ int main(int argc, char* argv[])
 			err = read_matrix(mat1, --argc, *++argv);
 			if (err) return err;
 
+			std::cout << mat1 << std::endl;
 			std::cout << "Determinant:  " << std::endl;
 			std::cout << mat1.det() << std::endl;
 		}
