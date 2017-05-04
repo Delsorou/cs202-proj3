@@ -479,10 +479,18 @@ T Matrix_ops<T>::det()
 	}
 
 	T determinant = 0;
-	for (std::size_t i = 1; i < rowB + 1; ++i)
+	for (std::size_t i = 1; i <= colB; ++i)
 	{
-		if ((rowB + i) % 2 == 0) determinant += minor[i - 1]->det();
-		else determinant += (minor[i - 1]->det() * -1);
+		if ((colB + i) % 2 == 0)
+		{
+			determinant
+			   	+= minor[i - 1]->det() * ELM(rowB,i - 1);
+		}
+		else
+		{
+			determinant
+				+= minor[i - 1]->det() * -1 * ELM(rowB,i - 1);
+		}
 	}
 
 	for (std::size_t i = 0; i < rowB; ++i) delete minor[i];
