@@ -8,15 +8,19 @@ COMPILER:          gcc 5.4.0
 
 NOTES:             None
 
+VERSION:           1.0
+
 ----------------------------------------------------------------------------- */
 
 #include <utility>
 #include <iomanip>
 #include <limits>
+
+// This is a shorthand macro for use when repeated element access is needed
 #define ELM(r,c) this->getElm(r, c)
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          goodSize(Matrix<T>& other)
+FUNCTION:          goodSize(const Matrix<T>& other) const
 DESCRIPTION:       Returns true if size is not too small to fit or way too big
 RETURNS:           bool
 NOTES:             Used to prevent unnecessary resizing on reassignment
@@ -24,7 +28,7 @@ NOTES:             Used to prevent unnecessary resizing on reassignment
 template <class T>
 bool Matrix<T>::goodSize(const Matrix<T>& other) const
 {
-	// If it's not too small, or more than twice as big, it's good
+	// If it's not too small, or too big, it's good
 	if ((row >= other.row && col >= other.col) 
 		&& (row <= other.row * MEM_PAD && col <= other.col * MEM_PAD))
 	   	return true;
@@ -34,7 +38,7 @@ bool Matrix<T>::goodSize(const Matrix<T>& other) const
 }
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          resize(Matrix<T>& other)
+FUNCTION:          resize(const Matrix<T>& other)
 DESCRIPTION:       Deletes the existing matrix and initialzes a new zero matrix
                    of specified row, column dimensions
 RETURNS:           Void function
@@ -48,7 +52,7 @@ void Matrix<T>::resize(const Matrix<T>& other)
 		delete[] mtx[i];
 	delete[] mtx;
 
-	// Create and initialize new matrix array of specified dimensions on heap
+	// Create and initialize new matrix arrays of specified dimensions on heap
 	mtx = new T*[other.row];
 	for (std::size_t i = 0; i < other.row; ++i)
 		mtx[i] = new T[other.col] { 0 };
@@ -58,7 +62,7 @@ void Matrix<T>::resize(const Matrix<T>& other)
 FUNCTION:          Matrix()
 DESCRIPTION:       Default constructor (1x1 zero matrix)
 RETURNS:           N/A
-NOTES:             Mathematic equivalent to integer zero
+NOTES:             Closest equivalent to integer zero
 ----------------------------------------------------------------------------- */
 template <class T>
 Matrix<T>::Matrix()
@@ -89,7 +93,7 @@ Matrix<T>::Matrix(const std::size_t r, const std::size_t c)
 }
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          Matrix(const Matrix<T>&)
+FUNCTION:          Matrix(const Matrix<T>& other)
 DESCRIPTION:       Copy constructor for Matrix class
 RETURNS:           N/A
 NOTES:             None
@@ -100,7 +104,7 @@ Matrix<T>::Matrix(const Matrix<T>& other)
 	// Initialize dimension values to other matrix values
 	row = other.row, col = other.col;
 
-	// Create new matrix of other dimensions and copy each element
+	// Create new matrix of other matrix dimensions and copy each element
 	mtx = new T*[row];
 	for (std::size_t i = 0; i < row; ++i)
 	{
@@ -111,11 +115,11 @@ Matrix<T>::Matrix(const Matrix<T>& other)
 }
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          Matrix(const Matrix<T>&&)
+FUNCTION:          Matrix(Matrix<T>&& other) noexcept
 DESCRIPTION:       Move constructor for Matrix class
 RETURNS:           N/A
 NOTES:             Constant time move construction for rvalue references
-                   (usually temporaries).
+                   (usually temporaries)... modifies parameter object
 ----------------------------------------------------------------------------- */
 template <class T>
 Matrix<T>::Matrix(Matrix<T>&& other) noexcept
@@ -172,11 +176,12 @@ Matrix<T>& Matrix<T>::operator=(const Matrix<T>& other)
 }
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          operator=(Matrix<T>&& other)
+FUNCTION:          operator=(Matrix<T>&& other) noexcept
 DESCRIPTION:       Move assignment operator for Matrix class
 RETURNS:           Matrix<T>&
 NOTES:             Constant time assignment for any size matrix when safe.
                    Used for rvalue references (usually temporaries)
+				   Modifies parameter object.
 ----------------------------------------------------------------------------- */
 template <class T>
 Matrix<T>& Matrix<T>::operator=(Matrix<T>&& other) noexcept
@@ -188,7 +193,8 @@ Matrix<T>& Matrix<T>::operator=(Matrix<T>&& other) noexcept
 	// Move memory resources directly
 	std::swap(mtx, other.mtx);
 
-	// Whee, that was fast, thanks C++11 move semantics!
+	/* One little, two little, three little assignments...
+	 * Whee, that was fast, thanks C++11 move semantics! */
 	return *this;
 }
 
@@ -342,24 +348,25 @@ Matrix_ops<T>& Matrix_ops<T>::operator*=(const Matrix_ops<T>& other)
 		}
 	}
 
-	// Force move self-assignment from local buffer (much faster)
+	// Force move self-assignment from local buffer before it leaves scope
 	*this = std::move(product);
 
 	return *this;
 }
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          operator*=(const Matrix_ops<T>& scalar)
+FUNCTION:          operator*=(const T scalar)
 DESCRIPTION:       Compound scalar multiplication assignment operator
                    for Matrix class
 RETURNS:           Matrix_ops<T>&
 NOTES:             None
 ----------------------------------------------------------------------------- */
 template <class T>
-Matrix_ops<T>& Matrix_ops<T>::operator*=(const T& scalar)
+Matrix_ops<T>& Matrix_ops<T>::operator*=(const T scalar)
 {
 	// Eliminate obvious cases
 	if (scalar == 1) return *this;
+	// If the scalar is zero, just construct a replacement zero matrix
 	else if (scalar == 0)
 	{
 		Matrix_ops<T> zero(this->getRow(), this->getCol());
@@ -377,7 +384,7 @@ Matrix_ops<T>& Matrix_ops<T>::operator*=(const T& scalar)
 }
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          operator==(const Matrix_ops<T>& other)
+FUNCTION:          operator==(const Matrix_ops<T>& other) const
 DESCRIPTION:       Compound addition assignment operator for Matrix class
 RETURNS:           bool
 NOTES:             None
@@ -436,7 +443,7 @@ Matrix_ops<T>& Matrix_ops<T>::trans()
 FUNCTION:          det()
 DESCRIPTION:       Returns the determinant of this matrix
 RETURNS:           T
-NOTES:             Matrix becomes matrix of minors
+NOTES:             Very easy to overrun template datatype with large matrices
 ----------------------------------------------------------------------------- */
 template <class T>
 T Matrix_ops<T>::det()
@@ -446,8 +453,11 @@ T Matrix_ops<T>::det()
 	// Eliminate invalid and base cases
 	if (rowB != colB || rowB == 0)
 		throw "Invalid operation (determinant)";
+	// Determinant of 1x1 is the value of its only entry
 	else if (rowB == 1)	return ELM(0,0);
+	// 2 x 2 base case
 	else if (rowB == 2)	return ELM(0,0) * ELM(1,1) - ELM(1,0) * ELM(0,1); 
+	// 3 x 3 diagonal product base case
 	else if (rowB == 3)
 	{
 		return
@@ -461,7 +471,8 @@ T Matrix_ops<T>::det()
 		};
 	}
 
-	// Create dynamic storage for a new round of minors and factors
+	/* We have not yet reached the base cases, so we need to compute.
+	 * Create dynamic storage for a new round of minors and factors. */
 	Matrix_ops<T>* minor[rowB];
 	T* factor[rowB];
 	for (std::size_t i = 0; i < rowB; ++i)
@@ -479,16 +490,16 @@ T Matrix_ops<T>::det()
 			{
 				if (n <= j) minor[n]->setElm(i, j, ELM(i,j + 1));
 				else minor[n]->setElm(i, j, ELM(i,j));
-				*factor[n] = ELM(i,j);
-				if (rowB + n % 2 != 0) *(factor[n]) *= -1;
 			}
 		}
+		*factor[n] = ELM(rowB,n);
+		if (rowB + n + 1 % 2 != 0) *factor[n] *= -1;
 	}
 
 	// Create a buffer and sum all the cofactors into it
 	T determinant = 0;
-	for (std::size_t i = 1; i <= colB; ++i)
-			determinant += minor[i - 1]->det() * *factor[i - 1];
+	for (std::size_t i = 0; i <= colB; ++i)
+			determinant += minor[i]->det() * *factor[i];
 
 	// Delete cofactor data storage
 	for (std::size_t i = 0; i < rowB; ++i)

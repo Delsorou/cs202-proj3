@@ -6,13 +6,9 @@ DESCRIPTION:       Driver for testing the Matrix class
 
 COMPILER:          gcc 5.4.0
 
-NOTES:             None
+NOTES:             Based on example code provided by Ed Corbett
 
-MODIFICATION HISTORY:
-
-Author                  Date               Version
----------------         ----------         --------------
-Aaryna Irwin            2017-04-11         0.1
+VERSION:           1.0
 
 ----------------------------------------------------------------------------- */
 
@@ -129,14 +125,14 @@ int main(int argc, char* argv[])
 				std::cout << mat3 << std::endl;
 			}
 
-//		if (strcmp(*argv, "-1") == 0)
-//		{
-//			err = read_matrix(mat1, --argc, *++argv);
-//			if (err) return err;
+//			if (strcmp(*argv, "-1") == 0)
+//			{
+//				err = read_matrix(mat1, --argc, *++argv);
+//				if (err) return err;
 //
-//			std::cout << "Inverse:  " << std::endl;
-//			std::cout << mat1.inv() << std::endl;
-//		}
+//				std::cout << "Inverse:  " << std::endl;
+//				std::cout << mat1.inv() << std::endl;
+//			}
 
 			if (strcmp(*argv, "-det") == 0)
 			{
@@ -148,14 +144,14 @@ int main(int argc, char* argv[])
 				std::cout << mat1.det() << std::endl;
 			}
 
-//		if (strcmp(*argv, "-solve") == 0)
-//		{
-//			err = read_matrix(mat1, --argc, *++argv);
-//			if (err) return err;
+//			if (strcmp(*argv, "-solve") == 0)
+//			{
+//				err = read_matrix(mat1, --argc, *++argv);
+//				if (err) return err;
 //
-//			std::cout << "Solution:  " << std::endl;
-//			std::cout << mat1.solve() << std::endl;
-//		}
+//				std::cout << "Solution:  " << std::endl;
+//				std::cout << mat1.solve() << std::endl;
+//			}
 		
 			if (strcmp(*argv, "-h") == 0)
 			{
@@ -171,8 +167,8 @@ int main(int argc, char* argv[])
 }
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          read_matrix(int, char**)
-DESCRIPTION:       The longer you wait, the harder it gets...
+FUNCTION:          read_matrix(Matrix<T>& mat1, int argc, char arg[])
+DESCRIPTION:       Reads matrix from specified filename
 RETURNS:           int
 NOTES:             None
 ----------------------------------------------------------------------------- */
@@ -207,8 +203,8 @@ int read_matrix(Matrix<T>& mat1, int argc, char arg[])
 }
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          read_file2(int, char**)
-DESCRIPTION:       The longer you wait, the harder it gets...
+FUNCTION:          read_file2(char file2[], int argc, char arg[])
+DESCRIPTION:       Parse argument for output file, if needed
 RETURNS:           int
 NOTES:             None
 ----------------------------------------------------------------------------- */
@@ -227,8 +223,8 @@ int read_file2(char file2[], int argc, char arg[])
 }
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          read_file2(int, char**)
-DESCRIPTION:       The longer you wait, the harder it gets...
+FUNCTION:          write_matrix(char file2[], Matrix<T>& mat)
+DESCRIPTION:       Writes matrices to the given output file
 RETURNS:           int
 NOTES:             None
 ----------------------------------------------------------------------------- */
@@ -250,6 +246,12 @@ int write_matrix(char file2[], Matrix<T>& mat)
 	return 0;
 }
 
+/* -----------------------------------------------------------------------------
+FUNCTION:          display_help()
+DESCRIPTION:       Displays the help section
+RETURNS:           Void function
+NOTES:             None
+----------------------------------------------------------------------------- */
 void display_help()
 {
 	using std::cout;

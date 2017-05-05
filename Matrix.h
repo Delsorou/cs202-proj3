@@ -10,13 +10,18 @@ COMPILER:          gcc 5.4.0
 
 NOTES:             None
 
+VERSION:           1.0
+
 ----------------------------------------------------------------------------- */
 
-// This is the multiplier on excess matrix dimensions before resizing
+#include <iostream>
+
+/* This is the multiplier on excess matrix dimensions before resizing.
+ * Do not make it less than 1.0... that would be a bad business decision. */
 #define MEM_PAD 1.5
+
 // This is the field size for matrix elements in iostream output
 #define FLD std::setw(5)
-#include <iostream>
 
 // Forward declare the class for I/O operator prototype list
 template <class T>
@@ -70,9 +75,11 @@ public:
 	{ return mtx[r][c]; };
 
 	// Assignment operator (Copy)
-	Matrix<T>& operator=(const Matrix<T>& other);
+	Matrix<T>& operator=
+		(const Matrix<T>& other);
 	// Assignment operator (Move) (rvalue reference)
-	Matrix<T>& operator=(Matrix<T>&& other) noexcept;
+	Matrix<T>& operator=
+		(Matrix<T>&& other) noexcept;
 
 	// Stream insertion operator of prototyped template type
 	friend std::ostream& operator<<<T>
@@ -96,13 +103,17 @@ public:
 	
 	// Compound assignment operators
 	// Addition assignment
-	Matrix_ops<T>& operator+=(const Matrix_ops<T>& other);
+	Matrix_ops<T>& operator+=
+		(const Matrix_ops<T>& other);
 	// Subtraction assignment
-	Matrix_ops<T>& operator-=(const Matrix_ops<T>& other);
+	Matrix_ops<T>& operator-=
+		(const Matrix_ops<T>& other);
 	// Matrix multiplication assignment
-	Matrix_ops<T>& operator*=(const Matrix_ops<T>& other);
+	Matrix_ops<T>& operator*=
+		(const Matrix_ops<T>& other);
 	// Scalar multiplication assignment
-	Matrix_ops<T>& operator*=(const T& scalar);
+	Matrix_ops<T>& operator*=
+		(const T scalar);
 
 	/* Binary operators are defined in terms of compound assignment and
 	 * declared inline friend so (class * subclass == subclass * class) */
@@ -119,16 +130,20 @@ public:
 		(Matrix_ops<T> left, const Matrix_ops<T>& other)
 	{ return left *= other; };
 	// Binary scalar multiplication
-	friend Matrix_ops<T> operator*(Matrix_ops<T> left, const T& scalar)
+	friend Matrix_ops<T> operator*
+		(Matrix_ops<T> left, const T scalar)
 	{ return left *= scalar; };
 	// Redefined for type symmetry
-	friend Matrix_ops<T> operator*(const T& scalar, Matrix_ops<T> right)
+	friend Matrix_ops<T> operator*
+		(const T scalar, Matrix_ops<T> right)
 	{ return right *= scalar; };
 
 	// Equality operator
-	bool operator==(const Matrix_ops<T>& other) const;
+	bool operator==
+		(const Matrix_ops<T>& other) const;
 	// Inequality operator defined using equality
-	bool operator!=(const Matrix_ops<T>& other) const
+	bool operator!=
+		(const Matrix_ops<T>& other) const
 	{ return !(*this == other); };
 
 	// Special matrix operations
