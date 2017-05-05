@@ -463,8 +463,12 @@ T Matrix_ops<T>::det()
 
 	// Well, we got this far, so time for another round of minors
 	Matrix_ops<T>* minor[rowB];
+	T* factor[rowB];
 	for (std::size_t i = 0; i < rowB; ++i)
+	{
 	   	minor[i] = new Matrix_ops<T>(rowB - 1, colB - 1);
+		factor[i] = new T {};
+	}
 
 	for (std::size_t n = 0; n < colB; ++n)
 	{
@@ -474,22 +478,19 @@ T Matrix_ops<T>::det()
 			{
 				if (n <= j) minor[n]->setElm(i, j, ELM(i,j + 1));
 				else minor[n]->setElm(i, j, ELM(i,j));
+				*factor[n] = ELM(i,j);
+				if (rowB + n % 2 != 0) *(factor[n]) *= -1;
 			}
 		}
 	}
 
 	T determinant = 0;
+	
 	for (std::size_t i = 1; i <= colB; ++i)
 	{
 		if ((colB + i) % 2 == 0)
 		{
-			determinant
-			   	+= minor[i - 1]->det() * ELM(rowB,i - 1);
-		}
-		else
-		{
-			determinant
-				+= minor[i - 1]->det() * -1 * ELM(rowB,i - 1);
+			determinant += minor[i - 1]->det() * *factor[i - 1];
 		}
 	}
 
