@@ -449,6 +449,7 @@ template <class T>
 T Matrix_ops<T>::det()
 {
 	std::size_t rowB = this->getRow(), colB = this->getCol();
+	std::cout << rowB << " x " << colB << ", new function call...\n";
 	
 	// Eliminate invalid and base cases
 	if (rowB != colB)
@@ -478,10 +479,11 @@ T Matrix_ops<T>::det()
 	for (std::size_t i = 0; i < colB; ++i)
 	{
 	   	minor[i] = new Matrix_ops<T>(rowB - 1, colB - 1);
-		factor[i] = new T {};
+		factor[i] = new T { ELM(rowB - 1,i) };
+		if (rowB + i + 1 % 2 != 0) *factor[i] *= -1;
 	}
 
-	// Populate the storage with all minors and factors
+	// Populate the minors
 	for (std::size_t n = 0; n < colB; ++n)
 	{
 		for (std::size_t i = 0; i < rowB - 1; ++i)
@@ -492,8 +494,6 @@ T Matrix_ops<T>::det()
 				else minor[n]->setElm(i, j, ELM(i,j));
 			}
 		}
-		*factor[n] = ELM(rowB - 1,n);
-		if (rowB + n + 1 % 2 != 0) *factor[n] *= -1;
 	}
 
 	// Create a buffer and sum all the cofactors into it
