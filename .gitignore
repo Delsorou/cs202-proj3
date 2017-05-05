@@ -4,4 +4,8 @@
 
 /*.sh
 
+/*.mtx
+
+/gen*
+
 matrix_math

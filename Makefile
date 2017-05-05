@@ -15,7 +15,7 @@
 CC=g++
 CFLAGS=-c -Wall -std=c++11
 LDFLAGS=
-SOURCES=Matrix.cpp matrix_math.cpp
+SOURCES=matrix_math.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=matrix_math
 
