@@ -42,86 +42,92 @@ int main(int argc, char* argv[])
 	char file2[20] = "";
 	Matrix_ops<int> mat1, mat2, mat3;
 
-	while (--argc)
+	try
 	{
-		++argv;
-
-		if (strcmp(*argv, "-inp") == 0)
+		while (--argc)
 		{
-			err = read_matrix(mat1, --argc, *++argv);
-			if (err) return err;
-			std::cout << "Input:  " << std::endl;
-			std::cout << mat1 << std::endl;
-		}
+			++argv;
 
-		if (strcmp(*argv, "-out") == 0)
-		{
-			err = read_file2(file2, --argc, *++argv);
-			if (err) return err;
-		}
+			if (strcmp(*argv, "-inp") == 0)
+			{
+				err = read_matrix(mat1, --argc, *++argv);
+				if (err) return err;
+				mat3 = mat1;
+				std::cout << "Input:  " << std::endl;
+				std::cout << mat3 << std::endl;
+			}
 
-		if (strcmp(*argv, "-add") == 0)
-		{
-			err = read_matrix(mat1, --argc, *++argv);
-			if (err) return err;
-			err = read_matrix(mat2, --argc, *++argv);
-			if (err) return err;
+			if (strcmp(*argv, "-out") == 0)
+			{
+				err = read_file2(file2, --argc, *++argv);
+				if (err) return err;
+			}
 
-			mat3 = mat1 + mat2;
-			std::cout << "Sum:  " << std::endl;
-			std::cout << mat1 << std::endl << '+' << mat2 << std::endl << '=';
-			std::cout << mat3 << std::endl;
-		}
+			if (strcmp(*argv, "-add") == 0)
+			{
+				err = read_matrix(mat1, --argc, *++argv);
+				if (err) return err;
+				err = read_matrix(mat2, --argc, *++argv);
+				if (err) return err;
+
+				mat3 = mat1 + mat2;
+				std::cout << "Sum:  " << std::endl;
+				std::cout << mat1 << std::endl << '+' << mat2 << std::endl
+					<< '=';
+				std::cout << mat3 << std::endl;
+			}
 		
-		if (strcmp(*argv, "-sub") == 0)
-		{
-			err = read_matrix(mat1, --argc, *++argv);
-			if (err) return err;
-			err = read_matrix(mat2, --argc, *++argv);
-			if (err) return err;
+			if (strcmp(*argv, "-sub") == 0)
+			{
+				err = read_matrix(mat1, --argc, *++argv);
+				if (err) return err;
+				err = read_matrix(mat2, --argc, *++argv);
+				if (err) return err;
 
-			mat3 = mat1 - mat2;
-			std::cout << "Difference:  " << std::endl;
-			std::cout << mat1 << std::endl << '-' << mat2 << std::endl << '=';
-			std::cout << mat3 << std::endl;
-		}
+				mat3 = mat1 - mat2;
+				std::cout << "Difference:  " << std::endl;
+				std::cout << mat1 << std::endl << '-' << mat2 << std::endl
+					<< '=';
+				std::cout << mat3 << std::endl;
+			}
 
-		if (strcmp(*argv, "-mul") == 0)
-		{
-			err = read_matrix(mat1, --argc, *++argv);
-			if (err) return err;
-			err = read_matrix(mat2, --argc, *++argv);
-			if (err) return err;
+			if (strcmp(*argv, "-mul") == 0)
+			{
+				err = read_matrix(mat1, --argc, *++argv);
+				if (err) return err;
+				err = read_matrix(mat2, --argc, *++argv);
+				if (err) return err;
 
-			mat3 = mat1 * mat2;
-			std::cout << "Product:  " << std::endl;
-			std::cout << mat1 << std::endl << 'x' << mat2 << std::endl << '=';
-			std::cout << mat3 << std::endl;
-		}
+				mat3 = mat1 * mat2;
+				std::cout << "Product:  " << std::endl;
+				std::cout << mat1 << std::endl << 'x' << mat2 << std::endl
+					<< '=';
+				std::cout << mat3 << std::endl;
+			}
 		
-		if (strcmp(*argv, "-eq") == 0)
-		{
-			err = read_matrix(mat1, --argc, *++argv);
-			if (err) return err;
-			err = read_matrix(mat2, --argc, *++argv);
-			if (err) return err;
+			if (strcmp(*argv, "-eq") == 0)
+			{
+				err = read_matrix(mat1, --argc, *++argv);
+				if (err) return err;
+				err = read_matrix(mat2, --argc, *++argv);
+				if (err) return err;
 
-			bool equality = mat1 == mat2;
-			std::cout << mat1 << std::endl << mat2 << std::endl;
-			std::cout << "Equality:  " << std::endl;
-			std::cout << std::boolalpha << equality << std::endl;
-		}
+				bool equality = mat1 == mat2;
+				std::cout << mat1 << std::endl << mat2 << std::endl;
+				std::cout << "Equality:  " << std::endl;
+				std::cout << std::boolalpha << equality << std::endl;
+			}
 
-		if (strcmp(*argv, "-T") == 0)
-		{
-			err = read_matrix(mat1, --argc, *++argv);
-			if (err) return err;
-
-			std::cout << mat1 << std::endl;
-			mat3 = mat1.trans();
-			std::cout << "Transpose:  " << std::endl;
-			std::cout << mat3 << std::endl;
-		}
+			if (strcmp(*argv, "-T") == 0)
+			{
+				err = read_matrix(mat1, --argc, *++argv);
+				if (err) return err;
+		
+				std::cout << mat1 << std::endl;
+				mat3 = mat1.trans();
+				std::cout << "Transpose:  " << std::endl;
+				std::cout << mat3 << std::endl;
+			}
 
 //		if (strcmp(*argv, "-1") == 0)
 //		{
@@ -132,15 +138,15 @@ int main(int argc, char* argv[])
 //			std::cout << mat1.inv() << std::endl;
 //		}
 
-		if (strcmp(*argv, "-det") == 0)
-		{
-			err = read_matrix(mat1, --argc, *++argv);
-			if (err) return err;
-
-			std::cout << mat1 << std::endl;
-			std::cout << "Determinant:  " << std::endl;
-			std::cout << mat1.det() << std::endl;
-		}
+			if (strcmp(*argv, "-det") == 0)
+			{
+				err = read_matrix(mat1, --argc, *++argv);
+				if (err) return err;
+	
+				std::cout << mat1 << std::endl;
+				std::cout << "Determinant:  " << std::endl;
+				std::cout << mat1.det() << std::endl;
+			}
 
 //		if (strcmp(*argv, "-solve") == 0)
 //		{
@@ -151,11 +157,13 @@ int main(int argc, char* argv[])
 //			std::cout << mat1.solve() << std::endl;
 //		}
 		
-		if (strcmp(*argv, "-h") == 0)
-		{
-			display_help();
+			if (strcmp(*argv, "-h") == 0)
+			{
+				display_help();
+			}
 		}
 	}
+	catch (const char* exc) { std::cout << exc << std::endl; };
 
 	if (*file2) write_matrix(file2, mat3);
 

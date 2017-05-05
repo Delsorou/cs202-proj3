@@ -12,7 +12,9 @@ NOTES:             None
 
 ----------------------------------------------------------------------------- */
 
-#define ELM(r,c) this->getElm(r, c)
+// This is the multiplier on excess matrix dimensions before resizing
+#define MEM_PAD 1.5
+// This is the field size for matrix elements in iostream output
 #define FLD std::setw(5)
 #include <iostream>
 
@@ -87,54 +89,55 @@ public:
 	// Default constructor
 	Matrix_ops() : Matrix<T>()
 	{ }
+	
 	// Derived class parameterized constructor
 	Matrix_ops(const std::size_t r, const std::size_t c) : Matrix<T>(r, c)
 	{ }
 	
-	// Addition compound assignment operator
+	// Compound assignment operators
+	// Addition assignment
 	Matrix_ops<T>& operator+=(const Matrix_ops<T>& other);
-	/* Binary addition operator defined via compound assignment
-	 * and declared as a friend for operand symmetry */
+	// Subtraction assignment
+	Matrix_ops<T>& operator-=(const Matrix_ops<T>& other);
+	// Matrix multiplication assignment
+	Matrix_ops<T>& operator*=(const Matrix_ops<T>& other);
+	// Scalar multiplication assignment
+	Matrix_ops<T>& operator*=(const T& scalar);
+
+	/* Binary operators are defined in terms of compound assignment and
+	 * declared inline friend so (class * subclass == subclass * class) */
+	// Binary addition
 	friend Matrix_ops<T> operator+
 		(Matrix_ops<T> left, const Matrix_ops<T>& other)
 	{ return left += other; };
-
-	// Subtraction compound assignment operator
-	Matrix_ops<T>& operator-=(const Matrix_ops<T>& other);
-	/* Binary subtraction operator defined via compound assignment
-	 * and declared as a friend for operand symmetry */
+	// Binary subtraction
 	friend Matrix_ops<T> operator-
 		(Matrix_ops<T> left, const Matrix_ops<T>& other)
 	{ return left -= other; };
-
-	// Matrix multiplication compound assignment operator
-	Matrix_ops<T>& operator*=(const Matrix_ops<T>& other);
-	/* Binary matrix multiplication operator defined via compound assignment
-	 * and declared as a friend for operand symmetry */
+	// Binary matrix multiplication
 	friend Matrix_ops<T> operator*
 		(Matrix_ops<T> left, const Matrix_ops<T>& other)
 	{ return left *= other; };
-	
-	// Scalar multiplication compound assignment operator
-	Matrix_ops<T>& operator*=(const T& scalar);
-	/* Binary scalar multiplication operator defined via compound assignment
-	 * and declared as a friend for operand symmetry */
+	// Binary scalar multiplication
 	friend Matrix_ops<T> operator*(Matrix_ops<T> left, const T& scalar)
 	{ return left *= scalar; };
+	// Redefined for type symmetry
+	friend Matrix_ops<T> operator*(const T& scalar, Matrix_ops<T> right)
+	{ return right *= scalar; };
 
 	// Equality operator
 	bool operator==(const Matrix_ops<T>& other) const;
-	// Inequality operator defined in terms of equality
+	// Inequality operator defined using equality
 	bool operator!=(const Matrix_ops<T>& other) const
 	{ return !(*this == other); };
 
 	// Special matrix operations
-	T solve(const Matrix_ops<T>& matrix) const;
+	// Determinant
 	T det();
-	Matrix_ops<T>& inv();
+	// Transpose
 	Matrix_ops<T>& trans();
 };
 
-// Include implementation file for template class design
+// Include implementation file, template class design cannot span TUs
 #include "Matrix.cpp"
 #endif // MATRIX_H

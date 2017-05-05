@@ -8,31 +8,25 @@ COMPILER:          gcc 5.4.0
 
 NOTES:             None
 
-MODIFICATION HISTORY:
-
-Author                  Date               Version
----------------         ----------         --------------
-Aaryna Irwin            2017-04-11         0.1
-
 ----------------------------------------------------------------------------- */
 
-#include <iostream>
 #include <utility>
 #include <iomanip>
 #include <limits>
+#define ELM(r,c) this->getElm(r, c)
 
 /* -----------------------------------------------------------------------------
 FUNCTION:          goodSize(Matrix<T>& other)
 DESCRIPTION:       Returns true if size is not too small to fit or way too big
 RETURNS:           bool
-NOTES:             None
+NOTES:             Used to prevent unnecessary resizing on reassignment
 ----------------------------------------------------------------------------- */
 template <class T>
 bool Matrix<T>::goodSize(const Matrix<T>& other) const
 {
 	// If it's not too small, or more than twice as big, it's good
-	if ((row > other.row && col > other.col) 
-		&& (row <= other.row * 2 && col <= other.col * 2))
+	if ((row >= other.row && col >= other.col) 
+		&& (row <= other.row * MEM_PAD && col <= other.col * MEM_PAD))
 	   	return true;
 	// Otherwise it's not
 	else
@@ -64,7 +58,7 @@ void Matrix<T>::resize(const Matrix<T>& other)
 FUNCTION:          Matrix()
 DESCRIPTION:       Default constructor (1x1 zero matrix)
 RETURNS:           N/A
-NOTES:             None
+NOTES:             Mathematic equivalent to integer zero
 ----------------------------------------------------------------------------- */
 template <class T>
 Matrix<T>::Matrix()
@@ -120,7 +114,8 @@ Matrix<T>::Matrix(const Matrix<T>& other)
 FUNCTION:          Matrix(const Matrix<T>&&)
 DESCRIPTION:       Move constructor for Matrix class
 RETURNS:           N/A
-NOTES:             None
+NOTES:             Constant time move construction for rvalue references
+                   (usually temporaries).
 ----------------------------------------------------------------------------- */
 template <class T>
 Matrix<T>::Matrix(Matrix<T>&& other) noexcept
@@ -180,12 +175,13 @@ Matrix<T>& Matrix<T>::operator=(const Matrix<T>& other)
 FUNCTION:          operator=(Matrix<T>&& other)
 DESCRIPTION:       Move assignment operator for Matrix class
 RETURNS:           Matrix<T>&
-NOTES:             None
+NOTES:             Constant time assignment for any size matrix when safe.
+                   Used for rvalue references (usually temporaries)
 ----------------------------------------------------------------------------- */
 template <class T>
 Matrix<T>& Matrix<T>::operator=(Matrix<T>&& other) noexcept
 {
-	// Copy matrix dimension values
+	// Swap matrix dimension values
 	std::swap(row, other.row);
    	std::swap(col, other.col);
 	
@@ -225,33 +221,37 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& other)
 FUNCTION:          operator>>(istream& is, Matrix<T>& other)
 DESCRIPTION:       Stream extraction operator for Matrix class
 RETURNS:           istream&
-NOTES:             None
+NOTES:             Only changes parameter if stream state is good after copy
 ----------------------------------------------------------------------------- */
 template <class T>
 std::istream& operator>>(std::istream& is, Matrix<T>& other)
 {
 	// Create template type buffers for matrix dimension values
-	T buffR, buffC;
+	std::size_t buffR, buffC;
 	// Extract row value from stream into buffer
 	is >> buffR;
 	// Skip the x
 	is.ignore(std::numeric_limits<std::streamsize>::max(), 'x');
-	// Extrract column value from stream into buffer
+	// Extract column value from stream into buffer
 	is >> buffC;
 
-	// Resize other matrix only if necessary
-	Matrix<T> buffMat(buffR, buffC);
-	if (!other.goodSize(buffMat))
-		other.resize(buffMat);
-
-	// Copy matrix dimension values
-	other.row = buffR, other.col = buffC;
+	// Create a buffer matrix
+	Matrix<T> buff(buffR, buffC);
 
 	// Extract the matrix entries, element by element
-	for (std::size_t i = 0; i < other.row; ++i)
+	for (std::size_t i = 0; i < buffR; ++i)
 	{
-		for (std::size_t j = 0; j < other.col; ++j)
-			is >> other.mtx[i][j];
+		for (std::size_t j = 0; j < buffC; ++j)
+			is >> buff.mtx[i][j];
+	}
+	
+	// Assign only if input completely
+	if (is.good())
+	{
+		// Resize other matrix only if necessary
+		if (!other.goodSize(buff))
+			other.resize(buff);
+		other = buff;
 	}
 
 	return is;
@@ -485,36 +485,18 @@ T Matrix_ops<T>::det()
 		}
 	}
 
-	// Create and sum all the cofactors
+	// Create a buffer and sum all the cofactors into it
 	T determinant = 0;
 	for (std::size_t i = 1; i <= colB; ++i)
 			determinant += minor[i - 1]->det() * *factor[i - 1];
 
-	for (std::size_t i = 0; i < rowB; ++i) delete minor[i];
+	// Delete cofactor data storage
+	for (std::size_t i = 0; i < rowB; ++i)
+	{
+		delete minor[i];
+		delete factor[i];
+	}
 
 	// And return the result
 	return determinant;
-}
-
-/* -----------------------------------------------------------------------------
-FUNCTION:          inv(T)
-DESCRIPTION:       Inverts the matrix
-RETURNS:           Matrix_ops<T>&
-NOTES:             None
------------------------------------------------------------------------------ */
-template <class T>
-Matrix_ops<T>& Matrix_ops<T>::inv()
-{
-//	if (determinant == 0)
-//		throw "Invalid operation (inverse)...";
-//
-//	// Create a local buffer to store the inverse
-//	Matrix_ops<T> inverse(this->getCol(), this->getRow());
-//
-//	inverse = (1 / determinant) * *this;
-//
-//	// Copy local buffer using move semantics
-//	*this = std::move(inverse);
-//
-//	return *this;
 }
