@@ -449,7 +449,8 @@ template <class T>
 T Matrix_ops<T>::det()
 {
 	std::size_t rowB = this->getRow(), colB = this->getCol();
-	std::cout << rowB << " x " << colB << ", new function call...\n";
+/*	DEBUG STATEMENT --------------------------------------------------------- */
+// 	std::cout << rowB << " x " << colB << ", new function call...\n"; 
 	
 	// Eliminate invalid and base cases
 	if (rowB != colB)
@@ -498,7 +499,7 @@ T Matrix_ops<T>::det()
 
 	// Create a buffer and sum all the cofactors into it
 	T determinant = 0;
-	for (std::size_t i = 0; i <= colB; ++i)
+	for (std::size_t i = 0; i < colB; ++i)
 			determinant += minor[i]->det() * *factor[i];
 
 	// Delete cofactor data storage
