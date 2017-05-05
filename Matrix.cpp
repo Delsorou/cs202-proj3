@@ -451,7 +451,7 @@ T Matrix_ops<T>::det()
 	std::size_t rowB = this->getRow(), colB = this->getCol();
 	
 	// Eliminate invalid and base cases
-	if (rowB != colB || rowB == 0)
+	if (rowB != colB)
 		throw "Invalid operation (determinant)";
 	// Determinant of 1x1 is the value of its only entry
 	else if (rowB == 1)	return ELM(0,0);
@@ -473,9 +473,9 @@ T Matrix_ops<T>::det()
 
 	/* We have not yet reached the base cases, so we need to compute.
 	 * Create dynamic storage for a new round of minors and factors. */
-	Matrix_ops<T>* minor[rowB];
-	T* factor[rowB];
-	for (std::size_t i = 0; i < rowB; ++i)
+	Matrix_ops<T>* minor[colB];
+	T* factor[colB];
+	for (std::size_t i = 0; i < colB; ++i)
 	{
 	   	minor[i] = new Matrix_ops<T>(rowB - 1, colB - 1);
 		factor[i] = new T {};
@@ -492,7 +492,7 @@ T Matrix_ops<T>::det()
 				else minor[n]->setElm(i, j, ELM(i,j));
 			}
 		}
-		*factor[n] = ELM(rowB,n);
+		*factor[n] = ELM(rowB - 1,n);
 		if (rowB + n + 1 % 2 != 0) *factor[n] *= -1;
 	}
 
