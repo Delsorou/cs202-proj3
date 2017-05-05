@@ -6,4 +6,6 @@
 
 /*.mtx
 
+/gen*
+
 matrix_math
