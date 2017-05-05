@@ -461,7 +461,7 @@ T Matrix_ops<T>::det()
 		};
 	}
 
-	// Well, we got this far, so time for another round of minors
+	// Create dynamic storage for a new round of minors and factors
 	Matrix_ops<T>* minor[rowB];
 	T* factor[rowB];
 	for (std::size_t i = 0; i < rowB; ++i)
@@ -470,6 +470,7 @@ T Matrix_ops<T>::det()
 		factor[i] = new T {};
 	}
 
+	// Populate the storage with all minors and factors
 	for (std::size_t n = 0; n < colB; ++n)
 	{
 		for (std::size_t i = 0; i < rowB - 1; ++i)
@@ -484,17 +485,14 @@ T Matrix_ops<T>::det()
 		}
 	}
 
+	// Create and sum all the cofactors
 	T determinant = 0;
-	
 	for (std::size_t i = 1; i <= colB; ++i)
-	{
-		if ((colB + i) % 2 == 0)
-		{
 			determinant += minor[i - 1]->det() * *factor[i - 1];
-		}
-	}
 
 	for (std::size_t i = 0; i < rowB; ++i) delete minor[i];
+
+	// And return the result
 	return determinant;
 }
 

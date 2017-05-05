@@ -118,8 +118,9 @@ int main(int argc, char* argv[])
 			if (err) return err;
 
 			std::cout << mat1 << std::endl;
+			mat3 = mat1.trans();
 			std::cout << "Transpose:  " << std::endl;
-			std::cout << mat1.trans() << std::endl;
+			std::cout << mat3 << std::endl;
 		}
 
 //		if (strcmp(*argv, "-1") == 0)
