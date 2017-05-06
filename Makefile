@@ -1,9 +1,10 @@
 # ------------------------------------------------------------------------------
+#
 # FILE:         Makefile
 #
 # DESCRIPTION:  Makefile for S2017 CS202 Project 3: Matrix Math Program
 #
-# NOTES:        None
+# NOTES:        Run make gen to build the matrix generator util
 #
 # ------------------------------------------------------------------------------
 
