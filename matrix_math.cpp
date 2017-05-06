@@ -6,13 +6,9 @@ DESCRIPTION:       Driver for testing the Matrix class
 
 COMPILER:          gcc 5.4.0
 
-NOTES:             None
+NOTES:             Based on example code provided by Ed Corbett
 
-MODIFICATION HISTORY:
-
-Author                  Date               Version
----------------         ----------         --------------
-Aaryna Irwin            2017-04-11         0.1
+VERSION:           1.0
 
 ----------------------------------------------------------------------------- */
 
@@ -42,120 +38,128 @@ int main(int argc, char* argv[])
 	char file2[20] = "";
 	Matrix_ops<int> mat1, mat2, mat3;
 
-	while (--argc)
+	try
 	{
-		++argv;
-
-		if (strcmp(*argv, "-inp") == 0)
+		while (--argc)
 		{
-			err = read_matrix(mat1, --argc, *++argv);
-			if (err) return err;
-			std::cout << "Input:  " << std::endl;
-			std::cout << mat1 << std::endl;
-		}
+			++argv;
 
-		if (strcmp(*argv, "-out") == 0)
-		{
-			err = read_file2(file2, --argc, *++argv);
-			if (err) return err;
-		}
+			if (strcmp(*argv, "-inp") == 0)
+			{
+				err = read_matrix(mat1, --argc, *++argv);
+				if (err) return err;
+				mat3 = mat1;
+				std::cout << "Input:  " << std::endl;
+				std::cout << mat3 << std::endl;
+			}
 
-		if (strcmp(*argv, "-add") == 0)
-		{
-			err = read_matrix(mat1, --argc, *++argv);
-			if (err) return err;
-			err = read_matrix(mat2, --argc, *++argv);
-			if (err) return err;
+			if (strcmp(*argv, "-out") == 0)
+			{
+				err = read_file2(file2, --argc, *++argv);
+				if (err) return err;
+			}
 
-			mat3 = mat1 + mat2;
-			std::cout << "Sum:  " << std::endl;
-			std::cout << mat1 << std::endl << '+' << mat2 << std::endl << '=';
-			std::cout << mat3 << std::endl;
-		}
+			if (strcmp(*argv, "-add") == 0)
+			{
+				err = read_matrix(mat1, --argc, *++argv);
+				if (err) return err;
+				err = read_matrix(mat2, --argc, *++argv);
+				if (err) return err;
+
+				mat3 = mat1 + mat2;
+				std::cout << "Sum:  " << std::endl;
+				std::cout << mat1 << std::endl << '+' << mat2 << std::endl
+					<< '=';
+				std::cout << mat3 << std::endl;
+			}
 		
-		if (strcmp(*argv, "-sub") == 0)
-		{
-			err = read_matrix(mat1, --argc, *++argv);
-			if (err) return err;
-			err = read_matrix(mat2, --argc, *++argv);
-			if (err) return err;
+			if (strcmp(*argv, "-sub") == 0)
+			{
+				err = read_matrix(mat1, --argc, *++argv);
+				if (err) return err;
+				err = read_matrix(mat2, --argc, *++argv);
+				if (err) return err;
 
-			mat3 = mat1 - mat2;
-			std::cout << "Difference:  " << std::endl;
-			std::cout << mat1 << std::endl << '-' << mat2 << std::endl << '=';
-			std::cout << mat3 << std::endl;
-		}
+				mat3 = mat1 - mat2;
+				std::cout << "Difference:  " << std::endl;
+				std::cout << mat1 << std::endl << '-' << mat2 << std::endl
+					<< '=';
+				std::cout << mat3 << std::endl;
+			}
 
-		if (strcmp(*argv, "-mul") == 0)
-		{
-			err = read_matrix(mat1, --argc, *++argv);
-			if (err) return err;
-			err = read_matrix(mat2, --argc, *++argv);
-			if (err) return err;
+			if (strcmp(*argv, "-mul") == 0)
+			{
+				err = read_matrix(mat1, --argc, *++argv);
+				if (err) return err;
+				err = read_matrix(mat2, --argc, *++argv);
+				if (err) return err;
 
-			mat3 = mat1 * mat2;
-			std::cout << "Product:  " << std::endl;
-			std::cout << mat1 << std::endl << 'x' << mat2 << std::endl << '=';
-			std::cout << mat3 << std::endl;
-		}
+				mat3 = mat1 * mat2;
+				std::cout << "Product:  " << std::endl;
+				std::cout << mat1 << std::endl << 'x' << mat2 << std::endl
+					<< '=';
+				std::cout << mat3 << std::endl;
+			}
 		
-		if (strcmp(*argv, "-eq") == 0)
-		{
-			err = read_matrix(mat1, --argc, *++argv);
-			if (err) return err;
-			err = read_matrix(mat2, --argc, *++argv);
-			if (err) return err;
+			if (strcmp(*argv, "-eq") == 0)
+			{
+				err = read_matrix(mat1, --argc, *++argv);
+				if (err) return err;
+				err = read_matrix(mat2, --argc, *++argv);
+				if (err) return err;
 
-			bool equality = mat1 == mat2;
-			std::cout << mat1 << std::endl << mat2 << std::endl;
-			std::cout << "Equality:  " << std::endl;
-			std::cout << std::boolalpha << equality << std::endl;
-		}
+				bool equality = mat1 == mat2;
+				std::cout << mat1 << std::endl << mat2 << std::endl;
+				std::cout << "Equality:  " << std::endl;
+				std::cout << std::boolalpha << equality << std::endl;
+			}
 
-		if (strcmp(*argv, "-T") == 0)
-		{
-			err = read_matrix(mat1, --argc, *++argv);
-			if (err) return err;
+			if (strcmp(*argv, "-T") == 0)
+			{
+				err = read_matrix(mat1, --argc, *++argv);
+				if (err) return err;
+		
+				std::cout << mat1 << std::endl;
+				mat3 = mat1.trans();
+				std::cout << "Transpose:  " << std::endl;
+				std::cout << mat3 << std::endl;
+			}
 
-			std::cout << mat1 << std::endl;
-			mat3 = mat1.trans();
-			std::cout << "Transpose:  " << std::endl;
-			std::cout << mat3 << std::endl;
-		}
-
-//		if (strcmp(*argv, "-1") == 0)
-//		{
-//			err = read_matrix(mat1, --argc, *++argv);
-//			if (err) return err;
+//			if (strcmp(*argv, "-1") == 0)
+//			{
+//				err = read_matrix(mat1, --argc, *++argv);
+//				if (err) return err;
 //
-//			std::cout << "Inverse:  " << std::endl;
-//			std::cout << mat1.inv() << std::endl;
-//		}
+//				std::cout << "Inverse:  " << std::endl;
+//				std::cout << mat1.inv() << std::endl;
+//			}
 
-		if (strcmp(*argv, "-det") == 0)
-		{
-			err = read_matrix(mat1, --argc, *++argv);
-			if (err) return err;
+			if (strcmp(*argv, "-det") == 0)
+			{
+				err = read_matrix(mat1, --argc, *++argv);
+				if (err) return err;
+	
+				std::cout << mat1 << std::endl;
+				std::cout << "Determinant:  " << std::endl;
+				std::cout << mat1.det() << std::endl;
+			}
 
-			std::cout << mat1 << std::endl;
-			std::cout << "Determinant:  " << std::endl;
-			std::cout << mat1.det() << std::endl;
-		}
-
-//		if (strcmp(*argv, "-solve") == 0)
-//		{
-//			err = read_matrix(mat1, --argc, *++argv);
-//			if (err) return err;
+//			if (strcmp(*argv, "-solve") == 0)
+//			{
+//				err = read_matrix(mat1, --argc, *++argv);
+//				if (err) return err;
 //
-//			std::cout << "Solution:  " << std::endl;
-//			std::cout << mat1.solve() << std::endl;
-//		}
+//				std::cout << "Solution:  " << std::endl;
+//				std::cout << mat1.solve() << std::endl;
+//			}
 		
-		if (strcmp(*argv, "-h") == 0)
-		{
-			display_help();
+			if (strcmp(*argv, "-h") == 0)
+			{
+				display_help();
+			}
 		}
 	}
+	catch (const char* exc) { std::cout << exc << std::endl; };
 
 	if (*file2) write_matrix(file2, mat3);
 
@@ -163,8 +167,8 @@ int main(int argc, char* argv[])
 }
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          read_matrix(int, char**)
-DESCRIPTION:       The longer you wait, the harder it gets...
+FUNCTION:          read_matrix(Matrix<T>& mat1, int argc, char arg[])
+DESCRIPTION:       Reads matrix from specified filename
 RETURNS:           int
 NOTES:             None
 ----------------------------------------------------------------------------- */
@@ -199,8 +203,8 @@ int read_matrix(Matrix<T>& mat1, int argc, char arg[])
 }
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          read_file2(int, char**)
-DESCRIPTION:       The longer you wait, the harder it gets...
+FUNCTION:          read_file2(char file2[], int argc, char arg[])
+DESCRIPTION:       Parse argument for output file, if needed
 RETURNS:           int
 NOTES:             None
 ----------------------------------------------------------------------------- */
@@ -219,8 +223,8 @@ int read_file2(char file2[], int argc, char arg[])
 }
 
 /* -----------------------------------------------------------------------------
-FUNCTION:          read_file2(int, char**)
-DESCRIPTION:       The longer you wait, the harder it gets...
+FUNCTION:          write_matrix(char file2[], Matrix<T>& mat)
+DESCRIPTION:       Writes matrices to the given output file
 RETURNS:           int
 NOTES:             None
 ----------------------------------------------------------------------------- */
@@ -242,6 +246,12 @@ int write_matrix(char file2[], Matrix<T>& mat)
 	return 0;
 }
 
+/* -----------------------------------------------------------------------------
+FUNCTION:          display_help()
+DESCRIPTION:       Displays the help section
+RETURNS:           Void function
+NOTES:             None
+----------------------------------------------------------------------------- */
 void display_help()
 {
 	using std::cout;
