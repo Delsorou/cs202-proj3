@@ -324,13 +324,13 @@ Matrix_ops<T>& Matrix_ops<T>::operator*=(const Matrix_ops<T>& other)
 {
 	// Create local dimension buffers to reduce function calls
 	std::size_t rowB = this->getRow(), colB = other.getCol();
-
+	
 	// Throw an exception if not suitable for multiplication
 	if (rowB != colB)
 		throw "Invalid operation (matrix multiplication)...";
-	
+
 	// Make a buffer object to hold the product
-	Matrix_ops<T> product(rowB, colB);
+	Matrix_ops<T> product(this->getRow(), other.getCol());
 
 	for (std::size_t i = 0; i < rowB; ++i)
 	{
@@ -338,7 +338,7 @@ Matrix_ops<T>& Matrix_ops<T>::operator*=(const Matrix_ops<T>& other)
 		{
 			// Create a buffer object
 			T buffer = 0;
-			// Take the dot product and store it in buffer
+			// Take the product and store it in buffer
 			for (std::size_t p = 0; p < colB; ++p)
 			{
 				buffer += this->getElm(i, p) * other.getElm(p, j);
