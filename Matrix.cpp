@@ -209,7 +209,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& other)
 {
 	// Insert the matrix dimensions on the first line
 	os << std::setprecision(3) << std::fixed << FLD 
-		<< other.row << " x " << std::left << other.col
+		<< other.row << " X " << std::left << other.col
 		<< std::right << std::endl;
 
 	// Insert the matrix, row per line
@@ -236,8 +236,8 @@ std::istream& operator>>(std::istream& is, Matrix<T>& other)
 	std::size_t buffR, buffC;
 	// Extract row value from stream into buffer
 	is >> buffR;
-	// Skip the x
-	is.ignore(std::numeric_limits<std::streamsize>::max(), 'x');
+	// Skip the X
+	is.ignore(std::numeric_limits<std::streamsize>::max(), 'X');
 	// Extract column value from stream into buffer
 	is >> buffC;
 
