@@ -322,27 +322,29 @@ NOTES:             None
 template <class T>
 Matrix_ops<T>& Matrix_ops<T>::operator*=(const Matrix_ops<T>& other)
 {
+	// Throw an exception if not suitable for multiplication
+	if (other.getRow() != this->getCol())
+		throw "Invalid operation (matrix multiplication)...";
+	
 	// Create local dimension buffers to reduce function calls
 	std::size_t rowB = this->getRow(), colB = other.getCol();
 	
-	// Throw an exception if not suitable for multiplication
-	if (rowB != colB)
-		throw "Invalid operation (matrix multiplication)...";
-
 	// Make a buffer object to hold the product
-	Matrix_ops<T> product(this->getRow(), other.getCol());
+	Matrix_ops<T> product(rowB, colB);
 
 	for (std::size_t i = 0; i < rowB; ++i)
 	{
 		for (std::size_t j = 0; j < colB; ++j)
 		{
-			// Create a buffer object
+			// Create a buffer object for the row product
 			T buffer = 0;
-			// Take the product and store it in buffer
-			for (std::size_t p = 0; p < colB; ++p)
+
+			for (std::size_t p = 0; p < rowB; ++p)
 			{
+				// Take the product and store it in buffer
 				buffer += this->getElm(i, p) * other.getElm(p, j);
 			}
+
 			// Set this entry to equal buffer
 			product.setElm(i, j, buffer);
 		}
@@ -366,17 +368,20 @@ Matrix_ops<T>& Matrix_ops<T>::operator*=(const T scalar)
 {
 	// Eliminate obvious cases
 	if (scalar == 1) return *this;
-	// If the scalar is zero, just construct a replacement zero matrix
 	else if (scalar == 0)
 	{
+		// If the scalar is zero, just construct a replacement zero matrix
 		Matrix_ops<T> zero(this->getRow(), this->getCol());
 		*this = std::move(zero);
 		return *this;
 	}	
+	
+	// Create local dimension buffers to reduce function calls in loop
+	std::size_t rowB = this->getRow(), colB = this->getCol();
 
-	for (std::size_t i = 0; i < this->getRow(); ++i)
+	for (std::size_t i = 0; i < rowB; ++i)
 	{
-		for (std::size_t j = 0; j < this->getCol(); ++j)
+		for (std::size_t j = 0; j < colB; ++j)
 			this->setElm(i, j, this->getElm(i, j) * scalar);
 	}
 
