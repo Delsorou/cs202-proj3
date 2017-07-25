@@ -389,6 +389,33 @@ Matrix_ops<T>& Matrix_ops<T>::operator*=(const T scalar)
 }
 
 /* -----------------------------------------------------------------------------
+FUNCTION:          operator/=(const T scalar)
+DESCRIPTION:       Compound scalar division assignment operator
+                   for Matrix class
+RETURNS:           Matrix_ops<T>&
+NOTES:             None
+----------------------------------------------------------------------------- */
+template <class T>
+Matrix_ops<T>& Matrix_ops<T>::operator/=(const T scalar)
+{
+	// Eliminate obvious cases
+	if (scalar == 1) return *this;
+	else if (scalar == 0)
+		throw "Invalid operation (scalar divide by zero)";
+	
+	// Create local dimension buffers to reduce function calls in loop
+	std::size_t rowB = this->getRow(), colB = this->getCol();
+
+	for (std::size_t i = 0; i < rowB; ++i)
+	{
+		for (std::size_t j = 0; j < colB; ++j)
+			this->setElm(i, j, this->getElm(i, j) / scalar);
+	}
+
+	return *this;
+}
+
+/* -----------------------------------------------------------------------------
 FUNCTION:          operator==(const Matrix_ops<T>& other) const
 DESCRIPTION:       Compound addition assignment operator for Matrix class
 RETURNS:           bool

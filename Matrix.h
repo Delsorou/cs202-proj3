@@ -114,6 +114,9 @@ public:
 	// Scalar multiplication assignment
 	Matrix_ops<T>& operator*=
 		(const T scalar);
+	// Scalar division assignment
+	Matrix_ops<T>& operator/=
+		(const T scalar);
 
 	/* Binary operators are defined in terms of compound assignment and
 	 * declared inline friend so (class * subclass == subclass * class) */
@@ -136,7 +139,11 @@ public:
 	// Redefined for type symmetry
 	friend Matrix_ops<T> operator*
 		(const T scalar, Matrix_ops<T> right)
-	{ return right *= scalar; };
+	{ return right *= scalar; }
+	// Binary scalar division
+	friend Matrix_ops<T> operator/
+		(Matrix_ops<T> left, const T scalar)
+	{ return left /= scalar; };
 
 	// Equality operator
 	bool operator==
