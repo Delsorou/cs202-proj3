@@ -486,18 +486,15 @@ T Matrix_ops<T>::det()
 	// Determinant of 1x1 is the value of its only entry
 	else if (rowB == 1)	return ELM(0,0);
 	// 2 x 2 base case
-	else if (rowB == 2)	return ELM(0,0) * ELM(1,1) - ELM(1,0) * ELM(0,1); 
-	// 3 x 3 diagonal product base case
+	else if (rowB == 2)	return ELM(0,0) * ELM(1,1) - ELM(0,1) * ELM(1,0); 
+	// 3 x 3 base case
 	else if (rowB == 3)
 	{
 		return
 		{
-			(ELM(0,2) * ELM(1,0) * ELM(2,1)
-			 + ELM(0,0) * ELM(1,1) * ELM(2,2)
-			 + ELM(0,1) * ELM(1,2) * ELM(2,0))
-			- (ELM(2,2) * ELM(1,0) * ELM(0,1)
-			 + ELM(2,0) * ELM(1,1) * ELM(0,2)
-			 + ELM(2,1) * ELM(1,2) * ELM(0,0))
+			ELM(0,0) * (ELM(1,1) * ELM(2,2) - ELM(1,2) * ELM(2,1)) -
+			ELM(0,1) * (ELM(1,0) * ELM(2,2) - ELM(1,2) * ELM(2,0)) +
+			ELM(0,2) * (ELM(1,0) * ELM(2,1) - ELM(1,1) * ELM(2,0))
 		};
 	}
 
