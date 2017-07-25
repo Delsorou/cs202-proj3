@@ -476,9 +476,8 @@ NOTES:             Very easy to overrun template datatype with large matrices
 template <class T>
 T Matrix_ops<T>::det()
 {
+	// Store dimensions in local scope to reduce function calls
 	std::size_t rowB = this->getRow(), colB = this->getCol();
-/*	DEBUG STATEMENT --------------------------------------------------------- */
-// 	std::cout << rowB << " x " << colB << ", new function call...\n"; 
 	
 	// Eliminate invalid and base cases
 	if (rowB != colB)
@@ -506,7 +505,7 @@ T Matrix_ops<T>::det()
 	{
 	   	minor[i] = new Matrix_ops<T>(rowB - 1, colB - 1);
 		factor[i] = new T { ELM(rowB - 1,i) };
-		if (rowB + i + 1 % 2 != 0) *factor[i] *= -1;
+		if ((rowB + i + 1) % 2 != 0) *factor[i] *= -1;
 	}
 
 	// Populate the minors
