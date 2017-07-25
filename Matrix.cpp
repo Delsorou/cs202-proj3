@@ -328,6 +328,7 @@ Matrix_ops<T>& Matrix_ops<T>::operator*=(const Matrix_ops<T>& other)
 	
 	// Create local dimension buffers to reduce function calls
 	std::size_t rowB = this->getRow(), colB = other.getCol();
+	std::size_t seek = other.getRow();
 	
 	// Make a buffer object to hold the product
 	Matrix_ops<T> product(rowB, colB);
@@ -336,16 +337,11 @@ Matrix_ops<T>& Matrix_ops<T>::operator*=(const Matrix_ops<T>& other)
 	{
 		for (std::size_t j = 0; j < colB; ++j)
 		{
-			// Create a buffer object for the row product
 			T buffer = 0;
-
-			for (std::size_t p = 0; p < rowB; ++p)
-			{
-				// Take the product and store it in buffer
+			
+			for (std::size_t p = 0; p < seek; ++p)
 				buffer += this->getElm(i, p) * other.getElm(p, j);
-			}
 
-			// Set this entry to equal buffer
 			product.setElm(i, j, buffer);
 		}
 	}
