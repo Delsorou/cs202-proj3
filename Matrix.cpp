@@ -8,7 +8,7 @@ COMPILER:          gcc 5.4.0
 
 NOTES:             None
 
-VERSION:           1.0
+VERSION:           1.0.1
 
 ----------------------------------------------------------------------------- */
 
@@ -209,7 +209,7 @@ std::ostream& operator<<(std::ostream& os, const Matrix<T>& other)
 {
 	// Insert the matrix dimensions on the first line
 	os << std::setprecision(3) << std::fixed << FLD 
-		<< other.row << " x " << std::left << other.col
+		<< other.row << " X " << std::left << other.col
 		<< std::right << std::endl;
 
 	// Insert the matrix, row per line
@@ -236,8 +236,8 @@ std::istream& operator>>(std::istream& is, Matrix<T>& other)
 	std::size_t buffR, buffC;
 	// Extract row value from stream into buffer
 	is >> buffR;
-	// Skip the x
-	is.ignore(std::numeric_limits<std::streamsize>::max(), 'x');
+	// Skip the X
+	is.ignore(std::numeric_limits<std::streamsize>::max(), 'X');
 	// Extract column value from stream into buffer
 	is >> buffC;
 
@@ -322,12 +322,13 @@ NOTES:             None
 template <class T>
 Matrix_ops<T>& Matrix_ops<T>::operator*=(const Matrix_ops<T>& other)
 {
+	// Throw an exception if not suitable for multiplication
+	if (other.getRow() != this->getCol())
+		throw "Invalid operation (matrix multiplication)...";
+	
 	// Create local dimension buffers to reduce function calls
 	std::size_t rowB = this->getRow(), colB = other.getCol();
-
-	// Throw an exception if not suitable for multiplication
-	if (rowB != colB)
-		throw "Invalid operation (matrix multiplication)...";
+	std::size_t seek = other.getRow();
 	
 	// Make a buffer object to hold the product
 	Matrix_ops<T> product(rowB, colB);
@@ -336,14 +337,11 @@ Matrix_ops<T>& Matrix_ops<T>::operator*=(const Matrix_ops<T>& other)
 	{
 		for (std::size_t j = 0; j < colB; ++j)
 		{
-			// Create a buffer object
 			T buffer = 0;
-			// Take the dot product and store it in buffer
-			for (std::size_t p = 0; p < colB; ++p)
-			{
+			
+			for (std::size_t p = 0; p < seek; ++p)
 				buffer += this->getElm(i, p) * other.getElm(p, j);
-			}
-			// Set this entry to equal buffer
+
 			product.setElm(i, j, buffer);
 		}
 	}
@@ -366,18 +364,48 @@ Matrix_ops<T>& Matrix_ops<T>::operator*=(const T scalar)
 {
 	// Eliminate obvious cases
 	if (scalar == 1) return *this;
-	// If the scalar is zero, just construct a replacement zero matrix
 	else if (scalar == 0)
 	{
+		// If the scalar is zero, just construct a replacement zero matrix
 		Matrix_ops<T> zero(this->getRow(), this->getCol());
 		*this = std::move(zero);
 		return *this;
 	}	
+	
+	// Create local dimension buffers to reduce function calls in loop
+	std::size_t rowB = this->getRow(), colB = this->getCol();
 
-	for (std::size_t i = 0; i < this->getRow(); ++i)
+	for (std::size_t i = 0; i < rowB; ++i)
 	{
-		for (std::size_t j = 0; j < this->getCol(); ++j)
+		for (std::size_t j = 0; j < colB; ++j)
 			this->setElm(i, j, this->getElm(i, j) * scalar);
+	}
+
+	return *this;
+}
+
+/* -----------------------------------------------------------------------------
+FUNCTION:          operator/=(const T scalar)
+DESCRIPTION:       Compound scalar division assignment operator
+                   for Matrix class
+RETURNS:           Matrix_ops<T>&
+NOTES:             None
+----------------------------------------------------------------------------- */
+template <class T>
+Matrix_ops<T>& Matrix_ops<T>::operator/=(const T scalar)
+{
+	// Eliminate obvious cases
+	if (scalar == 1) return *this;
+	else if (scalar == 0)
+		throw "Invalid operation (scalar divide by zero)";
+	
+	// Create local dimension buffers to reduce function calls in loop
+	std::size_t rowB = this->getRow(), colB = this->getCol();
+
+	for (std::size_t i = 0; i < rowB; ++i)
+	{
+		for (std::size_t j = 0; j < colB; ++j)
+			this->setElm(i, j, this->getElm(i, j) / scalar);
 	}
 
 	return *this;
@@ -448,9 +476,8 @@ NOTES:             Very easy to overrun template datatype with large matrices
 template <class T>
 T Matrix_ops<T>::det()
 {
+	// Store dimensions in local scope to reduce function calls
 	std::size_t rowB = this->getRow(), colB = this->getCol();
-/*	DEBUG STATEMENT --------------------------------------------------------- */
-// 	std::cout << rowB << " x " << colB << ", new function call...\n"; 
 	
 	// Eliminate invalid and base cases
 	if (rowB != colB)
@@ -458,18 +485,15 @@ T Matrix_ops<T>::det()
 	// Determinant of 1x1 is the value of its only entry
 	else if (rowB == 1)	return ELM(0,0);
 	// 2 x 2 base case
-	else if (rowB == 2)	return ELM(0,0) * ELM(1,1) - ELM(1,0) * ELM(0,1); 
-	// 3 x 3 diagonal product base case
+	else if (rowB == 2)	return ELM(0,0) * ELM(1,1) - ELM(0,1) * ELM(1,0); 
+	// 3 x 3 base case
 	else if (rowB == 3)
 	{
 		return
 		{
-			(ELM(0,2) * ELM(1,0) * ELM(2,1)
-			 + ELM(0,0) * ELM(1,1) * ELM(2,2)
-			 + ELM(0,1) * ELM(1,2) * ELM(2,0))
-			- (ELM(2,2) * ELM(1,0) * ELM(0,1)
-			 + ELM(2,0) * ELM(1,1) * ELM(0,2)
-			 + ELM(2,1) * ELM(1,2) * ELM(0,0))
+			ELM(0,0) * (ELM(1,1) * ELM(2,2) - ELM(1,2) * ELM(2,1)) -
+			ELM(0,1) * (ELM(1,0) * ELM(2,2) - ELM(1,2) * ELM(2,0)) +
+			ELM(0,2) * (ELM(1,0) * ELM(2,1) - ELM(1,1) * ELM(2,0))
 		};
 	}
 
@@ -481,7 +505,7 @@ T Matrix_ops<T>::det()
 	{
 	   	minor[i] = new Matrix_ops<T>(rowB - 1, colB - 1);
 		factor[i] = new T { ELM(rowB - 1,i) };
-		if (rowB + i + 1 % 2 != 0) *factor[i] *= -1;
+		if ((rowB + i + 1) % 2 != 0) *factor[i] *= -1;
 	}
 
 	// Populate the minors

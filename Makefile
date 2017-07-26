@@ -1,15 +1,11 @@
 # ------------------------------------------------------------------------------
+#
 # FILE:         Makefile
 #
 # DESCRIPTION:  Makefile for S2017 CS202 Project 3: Matrix Math Program
 #
-# NOTES:        None
+# NOTES:        Run make gen to build the matrix generator util
 #
-# MODIFICATION HISTORY:
-#
-# Author        Date          Modification(s)
-# -----------   ----------    ---------------
-# Aaryna Irwin  2017-03-25    0.1 - Initial version
 # ------------------------------------------------------------------------------
 
 CC=g++
@@ -28,4 +24,9 @@ $(EXECUTABLE) : $(OBJECTS)
 	$(CC) $(CFLAGS) $< -o $@
 
 clean :
-	rm $(OBJECTS); find . -name "$(EXECUTABLE)" ! -name "*.cpp" -type f -delete
+	rm $(OBJECTS);\
+		find . -name "$(EXECUTABLE)" ! -name "*.cpp" -type f -delete;\
+		find . -name "gen" ! -name "*.cpp" -type f -delete
+
+gen :
+	$(CC) -Wall -std=c++11 gen.cpp -o gen

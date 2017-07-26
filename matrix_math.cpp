@@ -8,7 +8,7 @@ COMPILER:          gcc 5.4.0
 
 NOTES:             Based on example code provided by Ed Corbett
 
-VERSION:           1.0
+VERSION:           1.0.1
 
 ----------------------------------------------------------------------------- */
 
@@ -261,14 +261,14 @@ void display_help()
 	cout << "Arguments:\n\n";
 	cout << ITEM << "-h" << DESC << "   Display this help file\n";
 	cout << ITEM << "-inp" << DESC << "   Display matrix\n";
-	cout << ITEM << "-out" << DESC << "   Save results\n";
+	cout << ITEM << "-out" << DESC << "   Save results to file\n";
 	cout << ITEM << "-add" << DESC << "   Add matrices\n";
 	cout << ITEM << "-sub" << DESC << "   Subtract matrices\n";
-	cout << ITEM << "-mul" << DESC << "   Multiply mattices\n";
+	cout << ITEM << "-mul" << DESC << "   Multiply matrices\n";
 	cout << ITEM << "-eq" << DESC << "   Test matrices for equality\n";
 	cout << ITEM << "-T" << DESC << "   Display transpose\n";
-	cout << ITEM << "-1" << DESC << "   Display inverse\n";
+	cout << ITEM << "-1" << DESC << "   Display inverse (NONFUNCTIONAL)\n";
 	cout << ITEM << "-det" << DESC	<< "   Display determinant\n";
 	cout << ITEM << "-solve" << DESC 
-		<< "   Attempt to solve as a set of equations\n";
+		<< "   Attempt to solve as a set of equations (NONFUNCTIONAL)\n";
 }
