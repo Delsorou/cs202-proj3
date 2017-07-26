@@ -9,7 +9,7 @@ COMPILER:          gcc 5.4.0
 NOTES:             Requires three arguments: [rows] [columns] [filename]
                    does NOT validate input, dev utility, use with caution
 
-VERSION:           0.1
+VERSION:           0.2
 
 ----------------------------------------------------------------------------- */
 
